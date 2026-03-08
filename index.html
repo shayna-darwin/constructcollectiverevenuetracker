@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -313,12 +312,40 @@ function sortBy(field) {
   renderTable();
 }
 
+function mapLead(l) {
+  const contact=(l.contacts||[])[0]||{};
+  const phone=(contact.phones||[])[0];
+  const email=(contact.emails||[])[0];
+  const task=(l.tasks||[]).filter(t=>!t.is_complete).sort((a,b)=>a.due_date<b.due_date?-1:1)[0];
+  return {
+    id:l.id, name:l.display_name||'Unknown',
+    statusLabel:l.status_label||'',
+    category:getCategory(l.status_label),
+    contactName:contact.name||'',
+    phone:phone?phone.phone:'', email:email?email.email:'',
+    taskDate:task?(task.due_date||''):'',
+    taskText:task?task.text:'',
+    lastActivity:l.date_updated||'',
+    dateCreated:l.date_created||'',
+    description:l.description||'',
+    closeUrl:`https://app.close.com/lead/${l.id}/`
+  };
+}
+
 async function loadFromClose() {
   document.getElementById('loader').style.display='flex';
   document.getElementById('loader-txt').textContent='Connecting to Close CRM...';
   setSyncStatus('syncing');
+  leads = [];
+
   try {
-    const statusData = await closeGet('/status/lead/');
+    // Load statuses and first batch in parallel
+    const [statusData, firstBatch] = await Promise.all([
+      closeGet('/status/lead/'),
+      closeGet(`/lead/?_limit=100&_skip=0&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description&_order_by=-date_updated`)
+    ]);
+
+    // Populate status filter
     const sel = document.getElementById('flt-status');
     sel.innerHTML='<option value="">All Statuses</option>';
     (statusData.data||[]).forEach(s=>{
@@ -326,43 +353,39 @@ async function loadFromClose() {
       o.value=s.label; o.textContent=s.label; sel.appendChild(o);
     });
 
-    let allLeads=[],hasMore=true,skip=0;
-    while(hasMore){
-      document.getElementById('loader-txt').textContent=`Loading leads... (${allLeads.length})`;
-      const data=await closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description`);
-      allLeads=allLeads.concat(data.data||[]);
-      hasMore=data.has_more||false;
-      skip+=100;
+    // Render first batch immediately — page feels instant
+    leads = (firstBatch.data||[]).map(mapLead);
+    document.getElementById('loader').style.display='none';
+    setSyncStatus('ok', 'Loading...');
+    renderAll();
+
+    // Load remaining pages in background — cap at 300 total (3 pages)
+    // This covers the vast majority of active leads without hammering the API
+    if (firstBatch.has_more) {
+      const pages = [
+        closeGet(`/lead/?_limit=100&_skip=100&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description&_order_by=-date_updated`),
+        closeGet(`/lead/?_limit=100&_skip=200&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description&_order_by=-date_updated`)
+      ];
+
+      // Render each page as it arrives
+      for (const page of pages) {
+        const data = await page;
+        const newLeads = (data.data||[]).map(mapLead);
+        leads = leads.concat(newLeads);
+        document.getElementById('sync-txt').textContent=`Live — ${leads.length} leads`;
+        renderAll();
+        if (!data.has_more) break;
+      }
     }
 
-    leads=allLeads.map(l=>{
-      const contact=(l.contacts||[])[0]||{};
-      const phone=(contact.phones||[])[0];
-      const email=(contact.emails||[])[0];
-      const task=(l.tasks||[]).filter(t=>!t.is_complete).sort((a,b)=>a.due_date<b.due_date?-1:1)[0];
-      return {
-        id:l.id, name:l.display_name||'Unknown',
-        statusLabel:l.status_label||'',
-        category:getCategory(l.status_label),
-        contactName:contact.name||'',
-        phone:phone?phone.phone:'', email:email?email.email:'',
-        taskDate:task?(task.due_date||''):'',
-        taskText:task?task.text:'',
-        lastActivity:l.date_updated||'',
-        dateCreated:l.date_created||'',
-        description:l.description||'',
-        closeUrl:`https://app.close.com/lead/${l.id}/`
-      };
-    });
+    setSyncStatus('ok', `Live — ${leads.length} leads`);
 
-    setSyncStatus('ok');
-    renderAll();
   } catch(e) {
     setSyncStatus('error','Error');
+    document.getElementById('loader').style.display='none';
     console.error(e);
     alert('Could not load Close CRM data: '+e.message+'\n\nMake sure this is hosted on Netlify.');
   }
-  document.getElementById('loader').style.display='none';
 }
 
 function renderStats() {
