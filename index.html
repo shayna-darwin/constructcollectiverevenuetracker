@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +24,7 @@
   --green:    #52c97a;
   --blue:     #5299e0;
   --orange:   #e08c42;
+  --purple:   #a07be0;
   --white:    #f5f2ec;
 }
 
@@ -56,15 +58,18 @@ body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-se
 
 .table-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border); gap: 12px; flex-wrap: wrap; }
 .section-label { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--muted2); }
-.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 .flt { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 12px; background: transparent; border: 1px solid var(--border2); color: var(--muted2); cursor: pointer; outline: none; transition: all 0.12s; }
 .flt:hover { border-color: var(--gold); color: var(--gold); }
 select.flt option { background: #1a1a1a; }
+input.flt { cursor: text; font-size: 11px; width: 130px; color-scheme: dark; }
+input.flt:focus { border-color: var(--gold); color: var(--text); }
 .count-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1px; color: var(--muted); white-space: nowrap; }
 
 .tbl-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
-thead th { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; font-weight: 600; }
+thead th { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; font-weight: 600; cursor: pointer; user-select: none; }
+thead th:hover { color: var(--gold); }
 tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
 tbody tr:hover { background: var(--surface2); }
 tbody tr.is-urgent { background: rgba(201,168,76,0.04); }
@@ -75,18 +80,20 @@ tbody td { padding: 12px 14px; vertical-align: middle; }
 .name-primary { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; line-height: 1.1; }
 .name-sub { font-size: 11px; color: var(--muted2); margin-top: 2px; }
 
-.status { display: inline-flex; align-items: center; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; padding: 3px 8px; border-left: 2px solid; white-space: nowrap; }
-.s-laydown  { border-color: var(--gold);   color: var(--gold);   background: rgba(201,168,76,0.08); }
-.s-followup { border-color: var(--orange); color: var(--orange); background: rgba(224,140,66,0.08); }
-.s-pending  { border-color: var(--blue);   color: var(--blue);   background: rgba(82,153,224,0.08); }
+.cat-badge { display: inline-flex; align-items: center; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; padding: 3px 8px; border-left: 2px solid; white-space: nowrap; }
+.s-deposit  { border-color: var(--gold);   color: var(--gold);   background: rgba(201,168,76,0.08); }
+.s-closer   { border-color: var(--orange); color: var(--orange); background: rgba(224,140,66,0.08); }
+.s-setter   { border-color: var(--blue);   color: var(--blue);   background: rgba(82,153,224,0.08); }
+.s-newlead  { border-color: var(--purple); color: var(--purple); background: rgba(160,123,224,0.08); }
 .s-missed   { border-color: var(--red);    color: var(--red);    background: rgba(224,82,82,0.08); }
-.s-closed   { border-color: var(--green);  color: var(--green);  background: rgba(82,201,122,0.08); }
+.s-signedup { border-color: var(--green);  color: var(--green);  background: rgba(82,201,122,0.08); }
+.s-closed   { border-color: var(--green);  color: var(--green);  background: rgba(82,201,122,0.12); }
+.s-nurture  { border-color: var(--muted2); color: var(--muted2); background: transparent; }
 .s-dead     { border-color: var(--muted);  color: var(--muted);  background: transparent; }
-.s-nurture  { border-color: var(--blue);   color: var(--blue);   background: rgba(82,153,224,0.06); }
-.s-active   { border-color: var(--muted2); color: var(--muted2); background: transparent; }
+.s-unknown  { border-color: var(--muted);  color: var(--muted);  background: transparent; }
 
-.date-txt { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 1px; }
-.d-overdue { color: var(--red); }
+.date-txt { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 0.5px; }
+.d-overdue { color: var(--red); font-weight: 700; }
 .d-today   { color: var(--gold); font-weight: 700; }
 .d-soon    { color: var(--orange); }
 .d-normal  { color: var(--muted2); }
@@ -96,6 +103,8 @@ tbody td { padding: 12px 14px; vertical-align: middle; }
 .note-dot:hover::after { content: attr(data-n); position: absolute; right: 26px; top: 50%; transform: translateY(-50%); background: var(--surface2); border: 1px solid var(--border2); padding: 8px 10px; font-size: 11px; color: var(--text); white-space: normal; min-width: 180px; max-width: 240px; z-index: 20; line-height: 1.5; }
 .ext-link { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(201,168,76,0.3); padding: 3px 8px; text-decoration: none; transition: all 0.12s; white-space: nowrap; }
 .ext-link:hover { background: rgba(201,168,76,0.1); }
+.sort-arrow { font-size: 9px; margin-left: 3px; opacity: 0.4; }
+.sort-arrow.active { opacity: 1; color: var(--gold); }
 
 .side {}
 .panel { padding: 18px 20px; border-bottom: 1px solid var(--border); }
@@ -105,9 +114,9 @@ tbody td { padding: 12px 14px; vertical-align: middle; }
 .hit-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
 .hit-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; }
 .hit-task { font-size: 11px; color: var(--muted2); margin-top: 2px; line-height: 1.4; }
-.hit-time { margin-left: auto; flex-shrink: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1px; }
+.hit-time { margin-left: auto; flex-shrink: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; }
 .bar-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
-.bar-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--muted2); width: 90px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--muted2); width: 110px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bar-track { flex: 1; height: 3px; background: var(--border); overflow: hidden; }
 .bar-fill { height: 100%; transition: width 0.5s ease; }
 .bar-num { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; width: 22px; text-align: right; flex-shrink: 0; }
@@ -159,10 +168,12 @@ tbody tr { animation: fadeIn 0.18s ease both; }
       <div class="filters">
         <select class="flt" id="flt-category" onchange="renderTable()">
           <option value="">All Categories</option>
-          <option value="laydown">Laydowns</option>
-          <option value="followup">Follow-Up</option>
-          <option value="pending">Pending</option>
+          <option value="deposit">Deposit Paid</option>
+          <option value="closer">Closer Follow Up</option>
+          <option value="setter">Setter Follow Up</option>
+          <option value="newlead">New Lead</option>
           <option value="missed">Missed Payment</option>
+          <option value="signedup">Signed Up</option>
           <option value="closed">Closed</option>
           <option value="nurture">Nurture</option>
           <option value="dead">Dead / DQ</option>
@@ -170,6 +181,9 @@ tbody tr { animation: fadeIn 0.18s ease both; }
         <select class="flt" id="flt-status" onchange="renderTable()">
           <option value="">All Statuses</option>
         </select>
+        <input type="date" class="flt" id="flt-date-from" onchange="renderTable()" title="Created from">
+        <input type="date" class="flt" id="flt-date-to" onchange="renderTable()" title="Created to">
+        <button class="flt" onclick="clearDates()">✕ Dates</button>
       </div>
       <span class="count-badge" id="row-count"></span>
     </div>
@@ -178,13 +192,14 @@ tbody tr { animation: fadeIn 0.18s ease both; }
         <thead>
           <tr>
             <th style="width:6px;padding:10px 4px 10px 10px;"></th>
-            <th>Name</th>
-            <th>Close Status</th>
-            <th>Category</th>
+            <th onclick="sortBy('name')">Name <span class="sort-arrow" id="sa-name">↕</span></th>
+            <th onclick="sortBy('statusLabel')">Close Status <span class="sort-arrow" id="sa-statusLabel">↕</span></th>
+            <th onclick="sortBy('category')">Category <span class="sort-arrow" id="sa-category">↕</span></th>
             <th>Contact</th>
-            <th>Last Activity</th>
-            <th>Next Task</th>
-            <th>Open in Close</th>
+            <th onclick="sortBy('lastActivity')">Last Activity <span class="sort-arrow" id="sa-lastActivity">↕</span></th>
+            <th onclick="sortBy('taskDate')">Task Date <span class="sort-arrow" id="sa-taskDate">↕</span></th>
+            <th onclick="sortBy('dateCreated')">Created <span class="sort-arrow" id="sa-dateCreated">↕</span></th>
+            <th>Open</th>
             <th></th>
           </tr>
         </thead>
@@ -205,15 +220,16 @@ tbody tr { animation: fadeIn 0.18s ease both; }
       <div id="hit-list"></div>
     </div>
     <div class="panel">
-      <div class="panel-title">Pipeline by Status</div>
+      <div class="panel-title">Pipeline by Category</div>
       <div id="pipeline-bars"></div>
     </div>
     <div class="panel" style="border-bottom:none;">
       <div class="panel-title">Operator Rules</div>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--gold);">Closer Follow Up = call today. No exceptions.</div>
-        <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--red);">Installment Owed = collect within 24 hours.</div>
-        <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--orange);">Triage Follow Up = setter re-engages same day.</div>
+        <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--gold);">Deposit Paid = collect remaining balance same day.</div>
+        <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--orange);">Closer Follow Up = call today. Post-call, needs closing.</div>
+        <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--red);">Missed Payment = contact within 24 hours. No exceptions.</div>
+        <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--blue);">Setter Follow Up = re-engage and re-route into pipeline.</div>
         <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--muted);">NGMI / DQ / Opt Out = dead. Stop working it.</div>
       </div>
     </div>
@@ -221,172 +237,220 @@ tbody tr { animation: fadeIn 0.18s ease both; }
 </div>
 
 <script>
-// Calls our Netlify function instead of Close directly
 async function closeGet(endpoint) {
   const r = await fetch('/.netlify/functions/close?endpoint=' + encodeURIComponent(endpoint));
-  if (!r.ok) throw new Error('Function error: ' + await r.text());
+  if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
 
 const STATUS_MAP = {
-  'Closer Follow Up': 'laydown', 'Triage Follow Up': 'laydown',
-  'Deposit Paid': 'laydown', 'CEO - Deposit': 'laydown', 'VIP - Deposit': 'laydown',
-  'Setter Booking': 'followup', 'Self Booking': 'followup', 'Setter Pipeline': 'followup',
-  'Reschedule': 'followup', 'Triage No Show': 'followup', 'No show': 'followup',
-  'New opportunity': 'pending', 'Organic Lead': 'pending', 'Clipping Lead': 'pending',
-  'Paid Lead': 'pending', 'DM Lead': 'pending',
-  'Installment owed': 'missed',
-  'Closed - Program': 'closed', 'CLOSED - EVENT': 'closed',
-  'signed up': 'closed', 'Low ticket Purchase': 'closed',
-  'Future Mastermind Nurture': 'nurture', 'Unresponsive': 'nurture',
-  'DQ': 'dead', 'opt out': 'dead', 'NGMI': 'dead',
-  'Refunded': 'dead', 'Low ticket - Broke': 'dead', 'Duplicate': 'dead',
+  'Deposit Paid':'deposit','CEO - Deposit':'deposit','VIP - Deposit':'deposit',
+  'Closer Follow Up':'closer',
+  'Triage Follow Up':'setter','Triage No Show':'setter','Reschedule':'setter',
+  'No show':'setter','Setter Pipeline':'setter','Setter Booking':'setter','Self Booking':'setter',
+  'New opportunity':'newlead','Organic Lead':'newlead','Clipping Lead':'newlead',
+  'Paid Lead':'newlead','DM Lead':'newlead',
+  'Installment owed':'missed',
+  'signed up':'signedup',
+  'Closed - Program':'closed','CLOSED - EVENT':'closed','Low ticket Purchase':'closed',
+  'Future Mastermind Nurture':'nurture','Unresponsive':'nurture',
+  'DQ':'dead','opt out':'dead','NGMI':'dead','Refunded':'dead',
+  'Low ticket - Broke':'dead','Duplicate':'dead'
 };
 
-const CATEGORY_LABELS  = { laydown:'Laydown', followup:'Follow-Up', pending:'Pending', missed:'Missed Payment', closed:'Closed', nurture:'Nurture', dead:'Dead / DQ', unknown:'Uncategorized' };
-const CATEGORY_COLORS  = { laydown:'var(--gold)', followup:'var(--orange)', pending:'var(--blue)', missed:'var(--red)', closed:'var(--green)', nurture:'var(--blue)', dead:'var(--muted)', unknown:'var(--muted)' };
-const STATUS_CLASS     = { laydown:'s-laydown', followup:'s-followup', pending:'s-pending', missed:'s-missed', closed:'s-closed', nurture:'s-nurture', dead:'s-dead', unknown:'s-active' };
+const CATEGORY_LABELS = {
+  deposit:'Deposit Paid', closer:'Closer Follow Up', setter:'Setter Follow Up',
+  newlead:'New Lead', missed:'Missed Payment', signedup:'Signed Up',
+  closed:'Closed', nurture:'Nurture', dead:'Dead / DQ', unknown:'Uncategorized'
+};
+const CATEGORY_COLORS = {
+  deposit:'var(--gold)', closer:'var(--orange)', setter:'var(--blue)',
+  newlead:'var(--purple)', missed:'var(--red)', signedup:'var(--green)',
+  closed:'var(--green)', nurture:'var(--muted2)', dead:'var(--muted)', unknown:'var(--muted)'
+};
+const STATUS_CLASS = {
+  deposit:'s-deposit', closer:'s-closer', setter:'s-setter', newlead:'s-newlead',
+  missed:'s-missed', signedup:'s-signedup', closed:'s-closed',
+  nurture:'s-nurture', dead:'s-dead', unknown:'s-unknown'
+};
+const CAT_ORDER = { missed:0, deposit:1, closer:2, setter:3, newlead:4, signedup:5, closed:6, nurture:7, dead:8, unknown:9 };
 
-let leads = [];
+let leads = [], sortField = 'category', sortDir = 'asc';
 
 function today() { return new Date().toISOString().split('T')[0]; }
 function addDays(n) { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
-function fmtDate(iso) { if (!iso) return ''; return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}); }
-function fmt(n) { if(n>=1000000) return (n/1000000).toFixed(1)+'M'; if(n>=1000) return (n/1000).toFixed(1)+'K'; return (n||0).toString(); }
-
-function setSyncStatus(state, msg) {
-  document.getElementById('sync-dot').className = 'sync-dot ' + state;
-  document.getElementById('sync-txt').textContent = msg || (state==='ok'?'Live — Close CRM':state==='syncing'?'Loading...':'Error');
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 }
-
+function fmtDateShort(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});
+}
+function setSyncStatus(state,msg) {
+  document.getElementById('sync-dot').className='sync-dot '+state;
+  document.getElementById('sync-txt').textContent=msg||(state==='ok'?'Live — Close CRM':state==='syncing'?'Loading...':'Error');
+}
 function getCategory(label) {
   if (!label) return 'unknown';
   if (STATUS_MAP[label]) return STATUS_MAP[label];
-  const lower = label.toLowerCase();
-  for (const [k,v] of Object.entries(STATUS_MAP)) {
-    if (k.toLowerCase() === lower) return v;
-  }
+  const l=label.toLowerCase();
+  for (const [k,v] of Object.entries(STATUS_MAP)) { if(k.toLowerCase()===l) return v; }
   return 'unknown';
+}
+function clearDates() {
+  document.getElementById('flt-date-from').value='';
+  document.getElementById('flt-date-to').value='';
+  renderTable();
+}
+function sortBy(field) {
+  sortDir = sortField===field ? (sortDir==='asc'?'desc':'asc') : 'asc';
+  sortField = field;
+  ['name','statusLabel','category','lastActivity','taskDate','dateCreated'].forEach(f=>{
+    const el=document.getElementById('sa-'+f);
+    if(el){ el.textContent=sortField===f?(sortDir==='asc'?'↑':'↓'):'↕'; el.className='sort-arrow'+(sortField===f?' active':''); }
+  });
+  renderTable();
 }
 
 async function loadFromClose() {
-  document.getElementById('loader').style.display = 'flex';
-  document.getElementById('loader-txt').textContent = 'Connecting to Close CRM...';
+  document.getElementById('loader').style.display='flex';
+  document.getElementById('loader-txt').textContent='Connecting to Close CRM...';
   setSyncStatus('syncing');
-
   try {
-    // Load statuses
     const statusData = await closeGet('/status/lead/');
-    const statusOptions = statusData.data || [];
     const sel = document.getElementById('flt-status');
-    sel.innerHTML = '<option value="">All Statuses</option>';
-    statusOptions.forEach(s => {
-      const o = document.createElement('option');
-      o.value = s.label; o.textContent = s.label;
-      sel.appendChild(o);
+    sel.innerHTML='<option value="">All Statuses</option>';
+    (statusData.data||[]).forEach(s=>{
+      const o=document.createElement('option');
+      o.value=s.label; o.textContent=s.label; sel.appendChild(o);
     });
 
-    // Load all leads
-    let allLeads = [], hasMore = true, skip = 0;
-    while (hasMore) {
-      document.getElementById('loader-txt').textContent = `Loading leads... (${allLeads.length})`;
-      const data = await closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description`);
-      allLeads = allLeads.concat(data.data || []);
-      hasMore = data.has_more || false;
-      skip += 100;
+    let allLeads=[],hasMore=true,skip=0;
+    while(hasMore){
+      document.getElementById('loader-txt').textContent=`Loading leads... (${allLeads.length})`;
+      const data=await closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description`);
+      allLeads=allLeads.concat(data.data||[]);
+      hasMore=data.has_more||false;
+      skip+=100;
     }
 
-    leads = allLeads.map(l => {
-      const contact  = (l.contacts||[])[0] || {};
-      const phone    = (contact.phones||[])[0];
-      const email    = (contact.emails||[])[0];
-      const task     = (l.tasks||[]).filter(t=>!t.is_complete).sort((a,b)=>a.due_date<b.due_date?-1:1)[0];
+    leads=allLeads.map(l=>{
+      const contact=(l.contacts||[])[0]||{};
+      const phone=(contact.phones||[])[0];
+      const email=(contact.emails||[])[0];
+      const task=(l.tasks||[]).filter(t=>!t.is_complete).sort((a,b)=>a.due_date<b.due_date?-1:1)[0];
       return {
-        id:           l.id,
-        name:         l.display_name || 'Unknown',
-        statusLabel:  l.status_label || '',
-        category:     getCategory(l.status_label),
-        contactName:  contact.name || '',
-        phone:        phone ? phone.phone : '',
-        email:        email ? email.email : '',
-        taskDate:     task ? task.due_date : '',
-        taskText:     task ? task.text : '',
-        lastActivity: l.date_updated || l.date_created || '',
-        description:  l.description || '',
-        closeUrl:     `https://app.close.com/lead/${l.id}/`
+        id:l.id, name:l.display_name||'Unknown',
+        statusLabel:l.status_label||'',
+        category:getCategory(l.status_label),
+        contactName:contact.name||'',
+        phone:phone?phone.phone:'', email:email?email.email:'',
+        taskDate:task?(task.due_date||''):'',
+        taskText:task?task.text:'',
+        lastActivity:l.date_updated||'',
+        dateCreated:l.date_created||'',
+        description:l.description||'',
+        closeUrl:`https://app.close.com/lead/${l.id}/`
       };
     });
 
     setSyncStatus('ok');
     renderAll();
   } catch(e) {
-    setSyncStatus('error', 'Error');
+    setSyncStatus('error','Error');
     console.error(e);
-    alert('Error loading Close data: ' + e.message);
+    alert('Could not load Close CRM data: '+e.message+'\n\nMake sure this is hosted on Netlify.');
   }
-  document.getElementById('loader').style.display = 'none';
+  document.getElementById('loader').style.display='none';
 }
 
 function renderStats() {
-  const laydowns = leads.filter(l=>l.category==='laydown').length;
+  const deposit  = leads.filter(l=>l.category==='deposit').length;
+  const closer   = leads.filter(l=>l.category==='closer').length;
   const missed   = leads.filter(l=>l.category==='missed').length;
+  const signedup = leads.filter(l=>l.category==='signedup').length;
   const closed   = leads.filter(l=>l.category==='closed').length;
-  const pipeline = leads.filter(l=>!['dead','closed'].includes(l.category)).length;
-  document.getElementById('stats-row').innerHTML = [
-    { label:'Total Leads',     val:leads.length, note:'In Close CRM',                              color:'var(--blue)'  },
-    { label:'Active Pipeline', val:pipeline,      note:'Needs action',                              color:'var(--gold)'  },
-    { label:'Laydowns',        val:laydowns,      note:'Close today',                               color:'var(--gold2)' },
-    { label:'Missed Payments', val:missed,        note:missed>0?'Collect now':'All current',        color:missed>0?'var(--red)':'var(--muted)' },
-    { label:'Closed',          val:closed,        note:'Won deals',                                 color:'var(--green)' }
+  document.getElementById('stats-row').innerHTML=[
+    {label:'Total Leads',      val:leads.length,      note:'In Close CRM',              color:'var(--blue)'},
+    {label:'Deposit Paid',     val:deposit,            note:'Collect balance',           color:'var(--gold)'},
+    {label:'Closer Follow Up', val:closer,             note:'Call today',                color:'var(--orange)'},
+    {label:'Missed Payment',   val:missed,             note:missed>0?'Act now':'Clear',  color:missed>0?'var(--red)':'var(--muted)'},
+    {label:'Closed / Signed',  val:closed+signedup,   note:'Won deals',                 color:'var(--green)'}
   ].map(s=>`<div class="stat" style="--stat-color:${s.color};"><div class="stat-label">${s.label}</div><div class="stat-val">${s.val}</div><div class="stat-note">${s.note}</div></div>`).join('');
 }
 
 function renderTable() {
-  const fCat    = document.getElementById('flt-category').value;
-  const fStatus = document.getElementById('flt-status').value;
-  const t       = today();
+  const fCat      = document.getElementById('flt-category').value;
+  const fStatus   = document.getElementById('flt-status').value;
+  const fDateFrom = document.getElementById('flt-date-from').value;
+  const fDateTo   = document.getElementById('flt-date-to').value;
+  const t         = today();
 
-  let rows = leads.filter(l => (!fCat||l.category===fCat) && (!fStatus||l.statusLabel===fStatus));
-  const catOrder = { missed:0, laydown:1, followup:2, pending:3, nurture:4, closed:5, dead:6, unknown:7 };
-  rows.sort((a,b)=>(catOrder[a.category]||5)-(catOrder[b.category]||5));
+  let rows=leads.filter(l=>{
+    if(fCat    && l.category!==fCat)       return false;
+    if(fStatus && l.statusLabel!==fStatus) return false;
+    if(fDateFrom||fDateTo){
+      const created=l.dateCreated?l.dateCreated.split('T')[0]:'';
+      if(fDateFrom && created<fDateFrom) return false;
+      if(fDateTo   && created>fDateTo)   return false;
+    }
+    return true;
+  });
 
-  document.getElementById('row-count').textContent = rows.length + ' leads';
-  const tbody = document.getElementById('tbl-body');
+  rows.sort((a,b)=>{
+    let av,bv;
+    if      (sortField==='category')     {av=CAT_ORDER[a.category]||9;   bv=CAT_ORDER[b.category]||9;}
+    else if (sortField==='name')         {av=a.name.toLowerCase();         bv=b.name.toLowerCase();}
+    else if (sortField==='statusLabel')  {av=a.statusLabel.toLowerCase();  bv=b.statusLabel.toLowerCase();}
+    else if (sortField==='lastActivity') {av=a.lastActivity||'';           bv=b.lastActivity||'';}
+    else if (sortField==='taskDate')     {av=a.taskDate||'9999';           bv=b.taskDate||'9999';}
+    else if (sortField==='dateCreated')  {av=a.dateCreated||'';            bv=b.dateCreated||'';}
+    else {av=0;bv=0;}
+    if(av<bv) return sortDir==='asc'?-1:1;
+    if(av>bv) return sortDir==='asc'?1:-1;
+    return 0;
+  });
 
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:48px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:1px;">No leads match</td></tr>`;
+  document.getElementById('row-count').textContent=rows.length+' leads';
+  const tbody=document.getElementById('tbl-body');
+
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:48px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:1px;">No leads match</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = rows.map(l => {
+  tbody.innerHTML=rows.map(l=>{
     const stripe   = CATEGORY_COLORS[l.category]||'var(--muted)';
-    const catClass = STATUS_CLASS[l.category]||'s-active';
+    const catClass = STATUS_CLASS[l.category]||'s-unknown';
     const catLabel = CATEGORY_LABELS[l.category]||l.category;
 
-    let dateCls='d-normal', dateTxt='';
-    if (l.taskDate) {
-      const d = l.taskDate.split('T')[0];
-      dateTxt = fmtDate(l.taskDate);
-      if      (d<t)        { dateCls='d-overdue'; dateTxt+=' ⚠'; }
-      else if (d===t)      { dateCls='d-today';   dateTxt='TODAY'; }
-      else if (d<=addDays(2)){ dateCls='d-soon'; }
+    let taskDateHtml='<span style="color:var(--muted);font-size:11px;">—</span>';
+    if(l.taskDate){
+      const d=l.taskDate.split('T')[0];
+      let cls='d-normal';
+      if(d<t) cls='d-overdue';
+      else if(d===t) cls='d-today';
+      else if(d<=addDays(2)) cls='d-soon';
+      taskDateHtml=`<span class="date-txt ${cls}">${fmtDate(l.taskDate)}</span>`;
     }
 
-    const contact  = l.phone||l.email||l.contactName||'—';
-    const lastAct  = l.lastActivity ? fmtDate(l.lastActivity) : '—';
-    const notesTxt = (l.taskText||l.description||'').replace(/"/g,'&quot;').substring(0,200);
-    const notesHtml= notesTxt ? `<span class="note-dot" data-n="${notesTxt}">i</span>` : '';
-    const isUrgent = ['missed','laydown'].includes(l.category);
+    const taskHtml=l.taskText?`<div style="font-size:11px;color:var(--muted2);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px;">${l.taskText}</div>`:'';
+    const contact=l.phone||l.email||l.contactName||'—';
+    const notesTxt=(l.taskText||l.description||'').replace(/"/g,'&quot;').substring(0,200);
+    const notesHtml=notesTxt?`<span class="note-dot" data-n="${notesTxt}">i</span>`:'';
+    const isUrgent=['missed','deposit','closer'].includes(l.category);
 
     return `
       <tr class="${isUrgent?'is-urgent':''}" onclick="window.open('${l.closeUrl}','_blank')">
         <td style="padding:12px 4px 12px 10px;"><span class="stripe" style="background:${stripe};"></span></td>
         <td><div class="name-primary">${l.name}</div>${l.contactName&&l.contactName!==l.name?`<div class="name-sub">${l.contactName}</div>`:''}</td>
         <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted2);">${l.statusLabel||'—'}</span></td>
-        <td><span class="status ${catClass}">${catLabel}</span></td>
+        <td><span class="cat-badge ${catClass}">${catLabel}</span></td>
         <td><span class="contact-tag">${contact}</span></td>
-        <td><span class="date-txt d-normal">${lastAct}</span></td>
-        <td>${l.taskText?`<div style="font-size:11px;color:var(--muted2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.taskText}</div>`:''}<span class="date-txt ${dateCls}">${dateTxt}</span></td>
+        <td><span class="date-txt d-normal">${fmtDate(l.lastActivity)}</span></td>
+        <td>${taskHtml}${taskDateHtml}</td>
+        <td><span class="date-txt d-normal">${fmtDate(l.dateCreated)}</span></td>
         <td onclick="event.stopPropagation();"><a href="${l.closeUrl}" target="_blank" class="ext-link">Open ↗</a></td>
         <td>${notesHtml}</td>
       </tr>`;
@@ -394,47 +458,48 @@ function renderTable() {
 }
 
 function renderSide() {
-  const t = today();
-  const urgent = leads.filter(l=>['missed','laydown'].includes(l.category));
-  const up = document.getElementById('urgent-panel');
-  if (urgent.length) {
+  const t=today();
+  const urgent=leads.filter(l=>['missed','deposit','closer'].includes(l.category));
+  const up=document.getElementById('urgent-panel');
+  if(urgent.length){
     up.style.display='block';
-    document.getElementById('urgent-list').innerHTML = urgent.slice(0,6).map(l=>`
-      <div class="alert-item">
-        <strong>${l.name}</strong>
-        <span style="color:${l.category==='missed'?'var(--red)':'var(--gold)'};font-family:'Barlow Condensed',sans-serif;font-size:12px;">${CATEGORY_LABELS[l.category]}</span>
-      </div>`).join('');
+    document.getElementById('urgent-list').innerHTML=urgent.slice(0,6).map(l=>`
+      <div class="alert-item"><strong>${l.name}</strong>
+      <span style="color:${CATEGORY_COLORS[l.category]};font-family:'Barlow Condensed',sans-serif;font-size:12px;">${CATEGORY_LABELS[l.category]}</span></div>`).join('');
   } else { up.style.display='none'; }
 
-  const hitting = leads.filter(l => {
-    if (['dead','closed'].includes(l.category)) return false;
-    if (['missed','laydown'].includes(l.category)) return true;
-    if (l.taskDate) return l.taskDate.split('T')[0] <= t;
+  const hitting=leads.filter(l=>{
+    if(['dead','closed','nurture'].includes(l.category)) return false;
+    if(['missed','deposit','closer'].includes(l.category)) return true;
+    if(l.taskDate) return l.taskDate.split('T')[0]<=t;
     return false;
-  }).sort((a,b)=>({missed:0,laydown:1,followup:2,pending:3}[a.category]||4)-({missed:0,laydown:1,followup:2,pending:3}[b.category]||4));
+  }).sort((a,b)=>(CAT_ORDER[a.category]||9)-(CAT_ORDER[b.category]||9));
 
-  const dotColors = { laydown:'var(--gold)', missed:'var(--red)', followup:'var(--orange)', pending:'var(--blue)', nurture:'var(--blue)' };
-  document.getElementById('hit-list').innerHTML = hitting.length
-    ? hitting.slice(0,7).map(l => {
-        const task = l.category==='laydown'?'Call + close today':l.category==='missed'?'Collect missed payment':l.taskText||'Follow up now';
-        const td   = l.taskDate ? l.taskDate.split('T')[0] : '';
-        const tl   = td===t?'TODAY':td&&td<t?'LATE':td?fmtDate(l.taskDate):'';
+  const dotColors={deposit:'var(--gold)',closer:'var(--orange)',missed:'var(--red)',setter:'var(--blue)',newlead:'var(--purple)',signedup:'var(--green)'};
+  document.getElementById('hit-list').innerHTML=hitting.length
+    ?hitting.slice(0,7).map(l=>{
+        const task=l.category==='deposit'?'Collect remaining balance'
+          :l.category==='closer'?'Call — post-call follow up'
+          :l.category==='missed'?'Collect missed payment'
+          :l.taskText||'Follow up now';
+        const td=l.taskDate?l.taskDate.split('T')[0]:'';
+        const tl=td?fmtDateShort(l.taskDate):'';
         return `<div class="hit-item"><div class="hit-dot" style="background:${dotColors[l.category]||'var(--blue)'}"></div><div style="flex:1;"><div class="hit-name">${l.name}</div><div class="hit-task">${task}</div></div><div class="hit-time" style="color:${td&&td<t?'var(--red)':'var(--muted)'}">${tl}</div></div>`;
       }).join('')
-    : `<div style="color:var(--muted);font-size:12px;padding:8px 0;">No urgent actions today.</div>`;
+    :`<div style="color:var(--muted);font-size:12px;padding:8px 0;">No urgent actions today.</div>`;
 
-  const cats = ['laydown','followup','pending','missed','closed','nurture','dead'];
-  const total = leads.length||1;
-  document.getElementById('pipeline-bars').innerHTML = cats.map(c => {
-    const cnt = leads.filter(l=>l.category===c).length;
-    const pct = Math.round(cnt/total*100);
+  const cats=['deposit','closer','setter','newlead','missed','signedup','closed','nurture','dead'];
+  const total=leads.length||1;
+  document.getElementById('pipeline-bars').innerHTML=cats.map(c=>{
+    const cnt=leads.filter(l=>l.category===c).length;
+    const pct=Math.round(cnt/total*100);
     return `<div class="bar-row"><div class="bar-label">${CATEGORY_LABELS[c]}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${CATEGORY_COLORS[c]};"></div></div><div class="bar-num" style="color:${CATEGORY_COLORS[c]};">${cnt}</div></div>`;
   }).join('');
 }
 
-function renderAll() { renderStats(); renderTable(); renderSide(); }
+function renderAll(){ renderStats(); renderTable(); renderSide(); }
 
-document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
 loadFromClose();
 </script>
 </body>
