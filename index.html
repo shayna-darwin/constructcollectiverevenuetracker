@@ -34,6 +34,9 @@ body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif;
 .month-pick:focus { border-color:var(--gold); }
 .btn-refresh { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px; letter-spacing:2px; text-transform:uppercase; padding:7px 18px; background:var(--gold); color:#000; border:none; cursor:pointer; transition:background 0.15s; }
 .btn-refresh:hover { background:var(--gold2); }
+.pipe-tab { font-family:'Barlow Condensed',sans-serif; font-size:9px; letter-spacing:1.5px; text-transform:uppercase; padding:4px 8px; background:transparent; border:1px solid var(--border2); color:var(--muted); cursor:pointer; transition:all 0.12s; }
+.pipe-tab.active { background:var(--surface2); border-color:var(--gold); color:var(--gold); }
+.pipe-tab:hover:not(.active) { border-color:var(--muted2); color:var(--muted2); }
 
 /* STATS */
 .stats { display:grid; grid-template-columns:repeat(6,1fr); border-bottom:1px solid var(--border); }
@@ -161,7 +164,7 @@ tbody tr { animation:fadeIn 0.15s ease both; }
 </header>
 
 <div class="stats" id="stats-row">
-  <div class="stat"><div class="stat-label">Total Leads</div><div class="stat-val" style="color:var(--muted);">—</div><div class="stat-note">Select a month</div></div>
+  <div class="stat"><div class="stat-label">Total Leads</div><div class="stat-val" style="color:var(--muted);">—</div><div class="stat-note">In Close CRM</div></div>
   <div class="stat"><div class="stat-label">Deposit Paid</div><div class="stat-val" style="color:var(--muted);">—</div></div>
   <div class="stat"><div class="stat-label">Closer Follow Up</div><div class="stat-val" style="color:var(--muted);">—</div></div>
   <div class="stat"><div class="stat-label">Missed Payment</div><div class="stat-val" style="color:var(--muted);">—</div></div>
@@ -209,6 +212,7 @@ tbody tr { animation:fadeIn 0.15s ease both; }
             <th onclick="sortBy('name')">Lead <span class="sort-arrow" id="sa-name">↕</span></th>
             <th onclick="sortBy('statusLabel')">Status <span class="sort-arrow" id="sa-statusLabel">↕</span></th>
             <th onclick="sortBy('category')">Category <span class="sort-arrow" id="sa-category">↕</span></th>
+            <th>Rep</th>
             <th>Contact</th>
             <th onclick="sortBy('lastActivity')">Last Activity <span class="sort-arrow" id="sa-lastActivity">↕</span></th>
             <th onclick="sortBy('taskDate')">Task Date <span class="sort-arrow" id="sa-taskDate">↕</span></th>
@@ -219,7 +223,7 @@ tbody tr { animation:fadeIn 0.15s ease both; }
           </tr>
         </thead>
         <tbody id="tbl-body">
-          <tr><td colspan="11"><div class="empty-month"><div class="empty-title">Select a Month</div><div class="empty-sub">Use the month picker in the top right<br>to load leads for that period.</div></div></td></tr>
+          <tr><td colspan="12"><div class="empty-month"><div class="empty-title">Loading Leads</div><div class="empty-sub">Connecting to Close CRM...</div></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -243,7 +247,14 @@ tbody tr { animation:fadeIn 0.15s ease both; }
       <div id="hit-list"><div style="color:var(--muted);font-size:12px;">Select a month to load.</div></div>
     </div>
     <div class="panel">
-      <div class="panel-title">Pipeline by Category</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="panel-title" style="margin-bottom:0;">Pipeline</div>
+        <div style="display:flex;gap:4px;">
+          <button class="pipe-tab active" id="tab-category" onclick="switchPipeTab('category')">Category</button>
+          <button class="pipe-tab" id="tab-closer" onclick="switchPipeTab('closer')">Closers</button>
+          <button class="pipe-tab" id="tab-setter" onclick="switchPipeTab('setter')">Setters</button>
+        </div>
+      </div>
       <div id="pipeline-bars"></div>
     </div>
     <div class="panel" style="border-bottom:none;">
@@ -300,7 +311,7 @@ const STATUS_CLASS = {
 const CAT_ORDER = {missed:0,deposit:1,closer:2,setter:3,newlead:4,signedup:5,closed:6,nurture:7,dead:8,unknown:9};
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
-let leads = [], sortField = 'category', sortDir = 'asc';
+let leads = [], sortField = 'category', sortDir = 'asc', pipeTab = 'category';
 let statusesLoaded = false;
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -359,78 +370,66 @@ function mapLead(l) {
   };
 }
 
-function getMonthRange(val) {
-  const [year,month] = val.split('-').map(Number);
-  const from = new Date(year,month-1,1).toISOString();
-  const to   = new Date(year,month,1).toISOString();
-  return { from, to };
-}
-
 // ─── LOAD ─────────────────────────────────────────────────────────────────────
 async function loadFromClose() {
   const monthVal = document.getElementById('month-picker').value;
-  if (!monthVal) { setSyncStatus('','Pick a month'); return; }
+  if (!monthVal) { setSyncStatus('', 'Pick a month'); return; }
 
   document.getElementById('loader').style.display='flex';
   document.getElementById('loader-txt').textContent='Loading leads...';
   setSyncStatus('syncing');
   leads=[];
 
-  const { from, to } = getMonthRange(monthVal);
+  const [year, month] = monthVal.split('-').map(Number);
+  const from = new Date(year, month-1, 1).toISOString();
+  const to   = new Date(year, month,   1).toISOString();
   const dateFilter = `&date_created__gte=${encodeURIComponent(from)}&date_created__lt=${encodeURIComponent(to)}`;
   const fields = 'id,display_name,status_label,contacts,tasks,opportunities,date_updated,date_created,description,assigned_to_name';
 
   try {
-    // Load statuses once
-    if (!statusesLoaded) {
-      const statusData = await closeGet('/status/lead/');
+    // Load statuses + first page simultaneously
+    const [statusResp, firstBatch] = await Promise.all([
+      statusesLoaded ? Promise.resolve(null) : closeGet('/status/lead/'),
+      closeGet(`/lead/?_limit=100&_skip=0&_fields=${fields}&_order_by=-date_updated${dateFilter}`)
+    ]);
+
+    if (statusResp) {
       const sel = document.getElementById('flt-status');
       sel.innerHTML='<option value="">All Statuses</option>';
-      (statusData.data||[]).forEach(s=>{
+      (statusResp.data||[]).forEach(s=>{
         const o=document.createElement('option');
         o.value=s.label; o.textContent=s.label; sel.appendChild(o);
       });
       statusesLoaded=true;
     }
 
-    // Load first page immediately — show data right away
-    const firstBatch = await closeGet(`/lead/?_limit=100&_skip=0&_fields=${fields}&_order_by=-date_updated${dateFilter}`);
+    // Render first 100 immediately
     leads = (firstBatch.data||[]).map(mapLead);
     document.getElementById('loader').style.display='none';
-    setSyncStatus('ok',`${leads.length} leads`);
+    setSyncStatus('ok', `${leads.length} leads`);
     renderAll();
     populateTeamFilters();
 
-    // Fire all remaining pages in parallel — no waiting around
-    if (firstBatch.has_more) {
-      // Fetch page 2 to find total, then blast all pages at once
-      const page2 = await closeGet(`/lead/?_limit=100&_skip=100&_fields=${fields}&_order_by=-date_updated${dateFilter}`);
-      const page2Leads = (page2.data||[]).map(mapLead);
-      leads = leads.concat(page2Leads);
-      renderAll();
+    if (!firstBatch.has_more) return;
 
-      if (page2.has_more) {
-        // Fire pages 3-10 simultaneously
-        const parallelPages = [];
-        for (let skip=200; skip<=900; skip+=100) {
-          parallelPages.push(
-            closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=${fields}&_order_by=-date_updated${dateFilter}`)
-              .then(d => (d.data||[]).map(mapLead))
-              .catch(()=>[])
-          );
-        }
-        const results = await Promise.all(parallelPages);
-        // Merge all results and filter out empty pages
-        for (const batch of results) {
-          if (batch.length === 0) break;
-          leads = leads.concat(batch);
-        }
-        renderAll();
-        populateTeamFilters();
-      }
+    // Blast all remaining pages in parallel
+    const parallelPages = [];
+    for (let skip=100; skip<=900; skip+=100) {
+      parallelPages.push(
+        closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=${fields}&_order_by=-date_updated${dateFilter}`)
+          .then(d => ({ skip, data:(d.data||[]).map(mapLead) }))
+          .catch(()=>({ skip, data:[] }))
+      );
     }
-
-    setSyncStatus('ok',`${leads.length} leads`);
+    const results = await Promise.all(parallelPages);
+    results.sort((a,b)=>a.skip-b.skip);
+    for (const r of results) {
+      if (!r.data.length) break;
+      leads = leads.concat(r.data);
+    }
+    setSyncStatus('ok', `${leads.length} leads`);
+    renderAll();
+    populateTeamFilters();
 
   } catch(e) {
     setSyncStatus('error','Error');
@@ -532,7 +531,7 @@ function renderTable() {
   const tbody=document.getElementById('tbl-body');
 
   if(!rows.length) {
-    tbody.innerHTML=`<tr><td colspan="11"><div class="empty-month"><div class="empty-title">No Leads Match</div><div class="empty-sub">Try adjusting your filters.</div></div></td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="12"><div class="empty-month"><div class="empty-title">No Leads Match</div><div class="empty-sub">Try adjusting your filters.</div></div></td></tr>`;
     return;
   }
 
@@ -563,6 +562,7 @@ function renderTable() {
         <td><div class="name-primary">${l.name}</div>${l.contactName&&l.contactName!==l.name?`<div class="name-sub">${l.contactName}</div>`:''}</td>
         <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--muted2);">${l.statusLabel||'—'}</span></td>
         <td><span class="cat-badge ${catClass}">${catLabel}</span></td>
+        <td>${l.category==='closer'&&l.closer?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--orange);border-left:2px solid var(--orange);padding-left:6px;">${l.closer}</span>`:l.category==='setter'&&l.setter?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--blue);border-left:2px solid var(--blue);padding-left:6px;">${l.setter}</span>`:'<span style="color:var(--muted);font-size:11px;">—</span>'}</td>
         <td><span class="contact-tag">${contact}</span></td>
         <td><span class="date-txt d-normal">${fmtDate(l.lastActivity)}</span></td>
         <td>${taskHtml}${taskDateHtml}</td>
@@ -572,6 +572,67 @@ function renderTable() {
         <td>${notesHtml}</td>
       </tr>`;
   }).join('');
+}
+
+// ─── PIPE TAB ─────────────────────────────────────────────────────────────────
+function switchPipeTab(tab) {
+  pipeTab = tab;
+  ['category','closer','setter'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.className='pipe-tab'+(t===tab?' active':'');
+  });
+  renderPipelineBars();
+}
+
+function renderPipelineBars() {
+  const el = document.getElementById('pipeline-bars');
+  if (!leads.length) { el.innerHTML=''; return; }
+
+  if (pipeTab === 'category') {
+    const cats=['deposit','closer','setter','newlead','missed','signedup','closed','nurture','dead'];
+    const total=leads.length||1;
+    el.innerHTML=cats.map(c=>{
+      const cnt=leads.filter(l=>l.category===c).length;
+      const pct=Math.round(cnt/total*100);
+      return `<div class="bar-row"><div class="bar-label">${CATEGORY_LABELS[c]}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${CATEGORY_COLORS[c]};"></div></div><div class="bar-num" style="color:${CATEGORY_COLORS[c]};">${cnt}</div></div>`;
+    }).join('');
+
+  } else if (pipeTab === 'closer') {
+    const closers = [...new Set(leads.map(l=>l.closer).filter(Boolean))].sort();
+    if (!closers.length) { el.innerHTML='<div style="color:var(--muted);font-size:12px;">No closers found.</div>'; return; }
+    const max = Math.max(...closers.map(c=>leads.filter(l=>l.closer===c).length));
+    el.innerHTML=closers.map(name=>{
+      const cnt = leads.filter(l=>l.closer===name).length;
+      const won = leads.filter(l=>l.closer===name && ['closed','signedup'].includes(l.category)).length;
+      const pct = Math.round(cnt/max*100);
+      return `<div class="bar-row" style="padding:6px 0;">
+        <div class="bar-label" style="width:90px;">${name}</div>
+        <div style="flex:1;">
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--orange);"></div></div>
+          <div style="font-size:9px;color:var(--muted2);margin-top:2px;">${won} closed / ${cnt} total</div>
+        </div>
+        <div class="bar-num" style="color:var(--orange);">${cnt}</div>
+      </div>`;
+    }).join('');
+
+  } else if (pipeTab === 'setter') {
+    const setters = [...new Set(leads.map(l=>l.setter).filter(Boolean))].sort();
+    if (!setters.length) { el.innerHTML='<div style="color:var(--muted);font-size:12px;">No setters found.</div>'; return; }
+    const max = Math.max(...setters.map(s=>leads.filter(l=>l.setter===s).length));
+    el.innerHTML=setters.map(name=>{
+      const cnt = leads.filter(l=>l.setter===name).length;
+      const booked = leads.filter(l=>l.setter===name && !['dead','nurture','newlead'].includes(l.category)).length;
+      const pct = Math.round(cnt/max*100);
+      return `<div class="bar-row" style="padding:6px 0;">
+        <div class="bar-label" style="width:90px;">${name}</div>
+        <div style="flex:1;">
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--blue);"></div></div>
+          <div style="font-size:9px;color:var(--muted2);margin-top:2px;">${booked} active / ${cnt} total</div>
+        </div>
+        <div class="bar-num" style="color:var(--blue);">${cnt}</div>
+      </div>`;
+    }).join('');
+  }
 }
 
 // ─── RENDER SIDE ──────────────────────────────────────────────────────────────
@@ -637,25 +698,23 @@ function renderSide() {
         const teamNote = l.closer ? ` · ${l.closer}` : '';
         return `<div class="hit-item"><div class="hit-dot" style="background:${dotColors[l.category]||'var(--blue)'}"></div><div style="flex:1;"><div class="hit-name">${l.name}</div><div class="hit-task">${task}${teamNote}</div></div><div class="hit-time" style="color:${td&&td<t?'var(--red)':'var(--muted)'}">${tl}</div></div>`;
       }).join('')
-    :`<div style="color:var(--muted);font-size:12px;padding:8px 0;">No urgent actions for this month.</div>`;
+    :`<div style="color:var(--muted);font-size:12px;padding:8px 0;">No urgent actions right now.</div>`;
 
-  const cats=['deposit','closer','setter','newlead','missed','signedup','closed','nurture','dead'];
-  const total=leads.length||1;
-  document.getElementById('pipeline-bars').innerHTML=cats.map(c=>{
-    const cnt=leads.filter(l=>l.category===c).length;
-    const pct=Math.round(cnt/total*100);
-    return `<div class="bar-row"><div class="bar-label">${CATEGORY_LABELS[c]}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${CATEGORY_COLORS[c]};"></div></div><div class="bar-num" style="color:${CATEGORY_COLORS[c]};">${cnt}</div></div>`;
-  }).join('');
+  renderPipelineBars();
 }
 
 function renderAll(){ renderStats(); renderTable(); renderSide(); }
 
-// Set current month as default
-const now = new Date();
-const defaultMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-document.getElementById('month-picker').value = defaultMonth;
-document.getElementById('hdr-date').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
-
+document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+// Default to current month — user can navigate back up to 6 months
+const _now = new Date();
+const _ym = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}`;
+const _mp = document.getElementById('month-picker');
+_mp.value = _ym;
+// Allow going back 6 months minimum
+const _minDate = new Date(_now.getFullYear(), _now.getMonth()-6, 1);
+_mp.min = `${_minDate.getFullYear()}-${String(_minDate.getMonth()+1).padStart(2,'0')}`;
+_mp.max = _ym;
 loadFromClose();
 </script>
 </body>
