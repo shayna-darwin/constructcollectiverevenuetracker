@@ -359,22 +359,18 @@ async function loadFromClose() {
     setSyncStatus('ok', 'Loading...');
     renderAll();
 
-    // Load remaining pages in background — cap at 300 total (3 pages)
-    // This covers the vast majority of active leads without hammering the API
+    // Load all remaining pages in background progressively
     if (firstBatch.has_more) {
-      const pages = [
-        closeGet(`/lead/?_limit=100&_skip=100&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description&_order_by=-date_updated`),
-        closeGet(`/lead/?_limit=100&_skip=200&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description&_order_by=-date_updated`)
-      ];
-
-      // Render each page as it arrives
-      for (const page of pages) {
-        const data = await page;
+      let skip = 100;
+      let hasMore = firstBatch.has_more;
+      while (hasMore) {
+        const data = await closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description&_order_by=-date_updated`);
         const newLeads = (data.data||[]).map(mapLead);
         leads = leads.concat(newLeads);
-        document.getElementById('sync-txt').textContent=`Live — ${leads.length} leads`;
+        document.getElementById('sync-txt').textContent=`Loading... ${leads.length} leads`;
         renderAll();
-        if (!data.has_more) break;
+        hasMore = data.has_more || false;
+        skip += 100;
       }
     }
 
