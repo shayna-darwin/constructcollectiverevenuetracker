@@ -209,7 +209,6 @@ tbody tr { animation:fadeIn 0.15s ease both; }
             <th onclick="sortBy('name')">Lead <span class="sort-arrow" id="sa-name">↕</span></th>
             <th onclick="sortBy('statusLabel')">Status <span class="sort-arrow" id="sa-statusLabel">↕</span></th>
             <th onclick="sortBy('category')">Category <span class="sort-arrow" id="sa-category">↕</span></th>
-            <th>Team</th>
             <th>Contact</th>
             <th onclick="sortBy('lastActivity')">Last Activity <span class="sort-arrow" id="sa-lastActivity">↕</span></th>
             <th onclick="sortBy('taskDate')">Task Date <span class="sort-arrow" id="sa-taskDate">↕</span></th>
@@ -558,20 +557,12 @@ function renderTable() {
     const notesHtml=notesTxt?`<span class="note-dot" data-n="${notesTxt}">i</span>`:'';
     const isUrgent=['missed','deposit','closer'].includes(l.category);
 
-    // Team pills
-    let teamHtml='<span style="color:var(--muted);font-size:11px;">—</span>';
-    const pills=[];
-    if(l.closer) pills.push(`<div class="team-pill team-closer"><span class="team-role">C</span>${l.closer}</div>`);
-    if(l.setter) pills.push(`<div class="team-pill team-setter"><span class="team-role">S</span>${l.setter}</div>`);
-    if(pills.length) teamHtml=`<div style="display:flex;flex-direction:column;gap:2px;">${pills.join('')}</div>`;
-
     return `
       <tr class="${isUrgent?'is-urgent':''}" onclick="window.open('${l.closeUrl}','_blank')">
         <td style="padding:11px 4px 11px 8px;"><span class="stripe" style="background:${stripe};"></span></td>
         <td><div class="name-primary">${l.name}</div>${l.contactName&&l.contactName!==l.name?`<div class="name-sub">${l.contactName}</div>`:''}</td>
         <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--muted2);">${l.statusLabel||'—'}</span></td>
         <td><span class="cat-badge ${catClass}">${catLabel}</span></td>
-        <td>${teamHtml}</td>
         <td><span class="contact-tag">${contact}</span></td>
         <td><span class="date-txt d-normal">${fmtDate(l.lastActivity)}</span></td>
         <td>${taskHtml}${taskDateHtml}</td>
