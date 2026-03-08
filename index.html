@@ -7,143 +7,144 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg:       #0d0d0d;
-  --surface:  #141414;
-  --surface2: #1a1a1a;
-  --border:   #252525;
-  --border2:  #2e2e2e;
-  --text:     #ede9e1;
-  --muted:    #555;
-  --muted2:   #888;
-  --gold:     #c9a84c;
-  --gold2:    #e8c97a;
-  --red:      #e05252;
-  --green:    #52c97a;
-  --blue:     #5299e0;
-  --orange:   #e08c42;
-  --purple:   #a07be0;
-  --white:    #f5f2ec;
+  --bg:#0d0d0d; --surface:#141414; --surface2:#1a1a1a;
+  --border:#252525; --border2:#2e2e2e;
+  --text:#ede9e1; --muted:#555; --muted2:#888;
+  --gold:#c9a84c; --gold2:#e8c97a;
+  --red:#e05252; --green:#52c97a; --blue:#5299e0;
+  --orange:#e08c42; --purple:#a07be0; --white:#f5f2ec;
 }
+body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif; font-size:14px; min-height:100vh; }
 
-body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; font-size: 14px; min-height: 100vh; }
-
-.header { display: flex; align-items: center; justify-content: space-between; padding: 16px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 50; }
-.brand { display: flex; align-items: baseline; gap: 10px; }
-.brand-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--white); }
-.brand-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
-.header-right { display: flex; align-items: center; gap: 12px; }
-.date-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
-.sync-status { display: flex; align-items: center; gap: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 12px; border: 1px solid var(--border2); color: var(--muted); }
-.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: background 0.3s; }
-.sync-dot.syncing { background: var(--gold); animation: pulse 1s infinite; }
-.sync-dot.ok { background: var(--green); }
-.sync-dot.error { background: var(--red); }
+/* HEADER */
+.header { display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:50; gap:12px; flex-wrap:wrap; }
+.brand { display:flex; align-items:baseline; gap:10px; }
+.brand-name { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; color:var(--white); }
+.brand-sub { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
+.header-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.date-badge { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+.sync-status { display:flex; align-items:center; gap:6px; font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; padding:5px 12px; border:1px solid var(--border2); color:var(--muted); white-space:nowrap; }
+.sync-dot { width:6px; height:6px; border-radius:50%; background:var(--muted); transition:background 0.3s; }
+.sync-dot.syncing { background:var(--gold); animation:pulse 1s infinite; }
+.sync-dot.ok { background:var(--green); }
+.sync-dot.error { background:var(--red); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-.btn-refresh { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; padding: 8px 20px; background: var(--gold); color: #000; border: none; cursor: pointer; transition: background 0.15s; }
-.btn-refresh:hover { background: var(--gold2); }
+.month-pick { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1px; padding:6px 12px; background:var(--surface2); border:1px solid var(--border2); color:var(--text); cursor:pointer; outline:none; color-scheme:dark; transition:border-color 0.12s; }
+.month-pick:focus { border-color:var(--gold); }
+.btn-refresh { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px; letter-spacing:2px; text-transform:uppercase; padding:7px 18px; background:var(--gold); color:#000; border:none; cursor:pointer; transition:background 0.15s; }
+.btn-refresh:hover { background:var(--gold2); }
 
-.stats { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--border); }
-.stat { padding: 22px 24px; border-right: 1px solid var(--border); position: relative; overflow: hidden; }
-.stat:last-child { border-right: none; }
-.stat::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--stat-color, transparent); opacity: 0.5; }
-.stat-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-.stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px; line-height: 1; color: var(--stat-color, var(--white)); }
-.stat-note { font-size: 11px; color: var(--muted2); margin-top: 5px; }
+/* STATS */
+.stats { display:grid; grid-template-columns:repeat(6,1fr); border-bottom:1px solid var(--border); }
+.stat { padding:18px 20px; border-right:1px solid var(--border); position:relative; overflow:hidden; }
+.stat:last-child { border-right:none; }
+.stat::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--stat-color,transparent); opacity:0.5; }
+.stat-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.stat-val { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; line-height:1; color:var(--stat-color,var(--white)); }
+.stat-note { font-size:11px; color:var(--muted2); margin-top:4px; }
 
-.body { display: grid; grid-template-columns: 1fr 300px; min-height: calc(100vh - 130px); }
-.main-col { border-right: 1px solid var(--border); overflow: hidden; }
+/* LAYOUT */
+.body { display:grid; grid-template-columns:1fr 290px; min-height:calc(100vh - 140px); }
+.main-col { border-right:1px solid var(--border); overflow:hidden; }
 
-.table-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border); gap: 12px; flex-wrap: wrap; }
-.section-label { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; color: var(--muted2); }
-.filters { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.flt { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 12px; background: transparent; border: 1px solid var(--border2); color: var(--muted2); cursor: pointer; outline: none; transition: all 0.12s; }
-.flt:hover { border-color: var(--gold); color: var(--gold); }
-select.flt option { background: #1a1a1a; }
-input.flt { cursor: text; font-size: 11px; width: 130px; color-scheme: dark; }
-input.flt:focus { border-color: var(--gold); color: var(--text); }
-.count-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1px; color: var(--muted); white-space: nowrap; }
+/* TOPBAR */
+.table-topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid var(--border); gap:10px; flex-wrap:wrap; }
+.section-label { font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:2px; color:var(--muted2); white-space:nowrap; }
+.filters { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.flt { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px; text-transform:uppercase; padding:5px 10px; background:transparent; border:1px solid var(--border2); color:var(--muted2); cursor:pointer; outline:none; transition:all 0.12s; }
+.flt:hover, .flt:focus { border-color:var(--gold); color:var(--gold); }
+select.flt option { background:#1a1a1a; }
+.count-badge { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:var(--muted); white-space:nowrap; }
 
-.tbl-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead th { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; font-weight: 600; cursor: pointer; user-select: none; }
-thead th:hover { color: var(--gold); }
-tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
-tbody tr:hover { background: var(--surface2); }
-tbody tr.is-urgent { background: rgba(201,168,76,0.04); }
-tbody tr.is-urgent:hover { background: rgba(201,168,76,0.08); }
-tbody td { padding: 12px 14px; vertical-align: middle; }
+/* TABLE */
+.tbl-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+thead th { font-family:'Barlow Condensed',sans-serif; font-size:9px; letter-spacing:1.8px; text-transform:uppercase; color:var(--muted); padding:9px 12px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; font-weight:600; cursor:pointer; user-select:none; }
+thead th:hover { color:var(--gold); }
+tbody tr { border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.1s; }
+tbody tr:hover { background:var(--surface2); }
+tbody tr.is-urgent { background:rgba(201,168,76,0.04); }
+tbody tr.is-urgent:hover { background:rgba(201,168,76,0.08); }
+tbody td { padding:11px 12px; vertical-align:middle; }
+.stripe { width:3px; height:30px; border-radius:1px; display:block; }
+.name-primary { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; line-height:1.1; }
+.name-sub { font-size:11px; color:var(--muted2); margin-top:2px; }
 
-.stripe { width: 3px; height: 32px; border-radius: 1px; display: block; }
-.name-primary { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; line-height: 1.1; }
-.name-sub { font-size: 11px; color: var(--muted2); margin-top: 2px; }
+/* BADGES */
+.cat-badge { display:inline-flex; align-items:center; font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px; text-transform:uppercase; padding:3px 7px; border-left:2px solid; white-space:nowrap; }
+.s-deposit  { border-color:var(--gold);   color:var(--gold);   background:rgba(201,168,76,0.08); }
+.s-closer   { border-color:var(--orange); color:var(--orange); background:rgba(224,140,66,0.08); }
+.s-setter   { border-color:var(--blue);   color:var(--blue);   background:rgba(82,153,224,0.08); }
+.s-newlead  { border-color:var(--purple); color:var(--purple); background:rgba(160,123,224,0.08); }
+.s-missed   { border-color:var(--red);    color:var(--red);    background:rgba(224,82,82,0.08); }
+.s-signedup { border-color:var(--green);  color:var(--green);  background:rgba(82,201,122,0.08); }
+.s-closed   { border-color:var(--green);  color:var(--green);  background:rgba(82,201,122,0.12); }
+.s-nurture  { border-color:var(--muted2); color:var(--muted2); background:transparent; }
+.s-dead     { border-color:var(--muted);  color:var(--muted);  background:transparent; }
+.s-unknown  { border-color:var(--muted);  color:var(--muted);  background:transparent; }
 
-.cat-badge { display: inline-flex; align-items: center; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; padding: 3px 8px; border-left: 2px solid; white-space: nowrap; }
-.s-deposit  { border-color: var(--gold);   color: var(--gold);   background: rgba(201,168,76,0.08); }
-.s-closer   { border-color: var(--orange); color: var(--orange); background: rgba(224,140,66,0.08); }
-.s-setter   { border-color: var(--blue);   color: var(--blue);   background: rgba(82,153,224,0.08); }
-.s-newlead  { border-color: var(--purple); color: var(--purple); background: rgba(160,123,224,0.08); }
-.s-missed   { border-color: var(--red);    color: var(--red);    background: rgba(224,82,82,0.08); }
-.s-signedup { border-color: var(--green);  color: var(--green);  background: rgba(82,201,122,0.08); }
-.s-closed   { border-color: var(--green);  color: var(--green);  background: rgba(82,201,122,0.12); }
-.s-nurture  { border-color: var(--muted2); color: var(--muted2); background: transparent; }
-.s-dead     { border-color: var(--muted);  color: var(--muted);  background: transparent; }
-.s-unknown  { border-color: var(--muted);  color: var(--muted);  background: transparent; }
+/* DATES */
+.date-txt { font-family:'Barlow Condensed',sans-serif; font-size:11px; }
+.d-overdue { color:var(--red); font-weight:700; }
+.d-today   { color:var(--gold); font-weight:700; }
+.d-soon    { color:var(--orange); }
+.d-normal  { color:var(--muted2); }
 
-.date-txt { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 0.5px; }
-.d-overdue { color: var(--red); font-weight: 700; }
-.d-today   { color: var(--gold); font-weight: 700; }
-.d-soon    { color: var(--orange); }
-.d-normal  { color: var(--muted2); }
+/* TEAM PILL */
+.team-pill { display:inline-flex; align-items:center; gap:4px; font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:0.5px; padding:2px 7px; border-radius:2px; white-space:nowrap; margin-bottom:2px; }
+.team-closer { background:rgba(224,140,66,0.12); color:var(--orange); border:1px solid rgba(224,140,66,0.2); }
+.team-setter { background:rgba(82,153,224,0.12); color:var(--blue);   border:1px solid rgba(82,153,224,0.2); }
+.team-role   { font-size:9px; opacity:0.7; text-transform:uppercase; letter-spacing:1px; }
 
-.contact-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--muted2); }
-.note-dot { width: 20px; height: 20px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); font-size: 10px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
-.note-dot:hover::after { content: attr(data-n); position: absolute; right: 26px; top: 50%; transform: translateY(-50%); background: var(--surface2); border: 1px solid var(--border2); padding: 8px 10px; font-size: 11px; color: var(--text); white-space: normal; min-width: 180px; max-width: 240px; z-index: 20; line-height: 1.5; }
-.ext-link { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(201,168,76,0.3); padding: 3px 8px; text-decoration: none; transition: all 0.12s; white-space: nowrap; }
-.ext-link:hover { background: rgba(201,168,76,0.1); }
-.sort-arrow { font-size: 9px; margin-left: 3px; opacity: 0.4; }
-.sort-arrow.active { opacity: 1; color: var(--gold); }
+.contact-tag { font-family:'Barlow Condensed',sans-serif; font-size:11px; color:var(--muted2); }
+.note-dot { width:18px; height:18px; border-radius:50%; background:var(--surface2); border:1px solid var(--border2); color:var(--muted); font-size:9px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; position:relative; }
+.note-dot:hover::after { content:attr(data-n); position:absolute; right:24px; top:50%; transform:translateY(-50%); background:var(--surface2); border:1px solid var(--border2); padding:8px 10px; font-size:11px; color:var(--text); white-space:normal; min-width:180px; max-width:240px; z-index:20; line-height:1.5; }
+.ext-link { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--gold); border:1px solid rgba(201,168,76,0.3); padding:3px 7px; text-decoration:none; transition:all 0.12s; white-space:nowrap; }
+.ext-link:hover { background:rgba(201,168,76,0.1); }
+.sort-arrow { font-size:9px; margin-left:2px; opacity:0.4; }
+.sort-arrow.active { opacity:1; color:var(--gold); }
 
-.side {}
-.panel { padding: 18px 20px; border-bottom: 1px solid var(--border); }
-.panel-title { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; }
-.hit-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
-.hit-item:last-child { border-bottom: none; }
-.hit-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-.hit-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; }
-.hit-task { font-size: 11px; color: var(--muted2); margin-top: 2px; line-height: 1.4; }
-.hit-time { margin-left: auto; flex-shrink: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; }
-.bar-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
-.bar-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--muted2); width: 110px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bar-track { flex: 1; height: 3px; background: var(--border); overflow: hidden; }
-.bar-fill { height: 100%; transition: width 0.5s ease; }
-.bar-num { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; width: 22px; text-align: right; flex-shrink: 0; }
-.alert-box { border: 1px solid var(--red); padding: 12px 14px; background: rgba(224,82,82,0.05); }
-.alert-title { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
-.alert-item { font-size: 12px; color: var(--muted2); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; }
-.alert-item:last-child { border-bottom: none; }
-.alert-item strong { color: var(--text); font-family: 'Barlow Condensed', sans-serif; font-size: 13px; }
+/* SIDE */
+.panel { padding:16px 18px; border-bottom:1px solid var(--border); }
+.panel-title { font-family:'Bebas Neue',sans-serif; font-size:12px; letter-spacing:2.5px; color:var(--muted); text-transform:uppercase; margin-bottom:12px; }
+.hit-item { display:flex; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+.hit-item:last-child { border-bottom:none; }
+.hit-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.hit-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; }
+.hit-task { font-size:11px; color:var(--muted2); margin-top:2px; line-height:1.4; }
+.hit-time { margin-left:auto; flex-shrink:0; font-family:'Barlow Condensed',sans-serif; font-size:10px; }
+.bar-row { display:flex; align-items:center; gap:6px; padding:4px 0; }
+.bar-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; text-transform:uppercase; color:var(--muted2); width:105px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bar-track { flex:1; height:3px; background:var(--border); overflow:hidden; }
+.bar-fill { height:100%; transition:width 0.5s ease; }
+.bar-num { font-family:'Barlow Condensed',sans-serif; font-size:11px; width:20px; text-align:right; flex-shrink:0; }
+.alert-box { border:1px solid var(--red); padding:10px 12px; background:rgba(224,82,82,0.05); }
+.alert-title { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--red); margin-bottom:8px; }
+.alert-item { font-size:12px; color:var(--muted2); padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.alert-item:last-child { border-bottom:none; }
+.alert-item strong { color:var(--text); font-family:'Barlow Condensed',sans-serif; font-size:13px; }
 
-.loading-overlay { position: fixed; inset: 0; background: rgba(13,13,13,0.95); z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
-.loading-spinner { width: 32px; height: 32px; border: 2px solid var(--border2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-txt { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+/* EMPTY STATE */
+.empty-month { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 40px; gap:16px; }
+.empty-title { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:2px; color:var(--muted); }
+.empty-sub { font-size:13px; color:var(--muted); text-align:center; line-height:1.6; }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-tbody tr { animation: fadeIn 0.18s ease both; }
-
-@media (max-width: 900px) {
-  .body { grid-template-columns: 1fr; }
-  .stats { grid-template-columns: repeat(3, 1fr); }
-}
+/* LOADER */
+.loading-overlay { position:fixed; inset:0; background:rgba(13,13,13,0.95); z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+.loading-spinner { width:32px; height:32px; border:2px solid var(--border2); border-top-color:var(--gold); border-radius:50%; animation:spin 0.7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-txt { font-family:'Barlow Condensed',sans-serif; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+tbody tr { animation:fadeIn 0.15s ease both; }
+@media(max-width:900px){ .body{grid-template-columns:1fr} .stats{grid-template-columns:repeat(3,1fr)} }
 </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loader">
+<div class="loading-overlay" id="loader" style="display:none;">
   <div class="loading-spinner"></div>
-  <div class="loading-txt" id="loader-txt">Connecting to Close CRM...</div>
+  <div class="loading-txt" id="loader-txt">Loading...</div>
 </div>
 
 <header class="header">
@@ -153,17 +154,25 @@ tbody tr { animation: fadeIn 0.18s ease both; }
   </div>
   <div class="header-right">
     <span class="date-badge" id="hdr-date"></span>
-    <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Connecting</span></div>
+    <input type="month" id="month-picker" class="month-pick" onchange="loadFromClose()">
+    <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-txt">Pick a month</span></div>
     <button class="btn-refresh" onclick="loadFromClose()">↻ Refresh</button>
   </div>
 </header>
 
-<div class="stats" id="stats-row"></div>
+<div class="stats" id="stats-row">
+  <div class="stat"><div class="stat-label">Total Leads</div><div class="stat-val" style="color:var(--muted);">—</div><div class="stat-note">Select a month</div></div>
+  <div class="stat"><div class="stat-label">Deposit Paid</div><div class="stat-val" style="color:var(--muted);">—</div></div>
+  <div class="stat"><div class="stat-label">Closer Follow Up</div><div class="stat-val" style="color:var(--muted);">—</div></div>
+  <div class="stat"><div class="stat-label">Missed Payment</div><div class="stat-val" style="color:var(--muted);">—</div></div>
+  <div class="stat"><div class="stat-label">Signed Up</div><div class="stat-val" style="color:var(--muted);">—</div></div>
+  <div class="stat"><div class="stat-label">Closed</div><div class="stat-val" style="color:var(--muted);">—</div></div>
+</div>
 
 <div class="body">
   <div class="main-col">
     <div class="table-topbar">
-      <span class="section-label">All Leads</span>
+      <span class="section-label">Leads</span>
       <div class="filters">
         <select class="flt" id="flt-category" onchange="renderTable()">
           <option value="">All Categories</option>
@@ -180,9 +189,15 @@ tbody tr { animation: fadeIn 0.18s ease both; }
         <select class="flt" id="flt-status" onchange="renderTable()">
           <option value="">All Statuses</option>
         </select>
-        <input type="date" class="flt" id="flt-date-from" onchange="renderTable()" title="Created from">
-        <input type="date" class="flt" id="flt-date-to" onchange="renderTable()" title="Created to">
-        <button class="flt" onclick="clearDates()">✕ Dates</button>
+        <select class="flt" id="flt-closer" onchange="renderTable()">
+          <option value="">All Closers</option>
+        </select>
+        <select class="flt" id="flt-setter" onchange="renderTable()">
+          <option value="">All Setters</option>
+        </select>
+        <input type="date" class="flt" id="flt-date-from" onchange="renderTable()" title="From date" style="color-scheme:dark;width:130px;">
+        <input type="date" class="flt" id="flt-date-to" onchange="renderTable()" title="To date" style="color-scheme:dark;width:130px;">
+        <button class="flt" onclick="clearDates()" style="color:var(--muted2);cursor:pointer;">&#x2715; Dates</button>
       </div>
       <span class="count-badge" id="row-count"></span>
     </div>
@@ -190,10 +205,11 @@ tbody tr { animation: fadeIn 0.18s ease both; }
       <table>
         <thead>
           <tr>
-            <th style="width:6px;padding:10px 4px 10px 10px;"></th>
-            <th onclick="sortBy('name')">Name <span class="sort-arrow" id="sa-name">↕</span></th>
-            <th onclick="sortBy('statusLabel')">Close Status <span class="sort-arrow" id="sa-statusLabel">↕</span></th>
+            <th style="width:4px;padding:9px 4px 9px 8px;"></th>
+            <th onclick="sortBy('name')">Lead <span class="sort-arrow" id="sa-name">↕</span></th>
+            <th onclick="sortBy('statusLabel')">Status <span class="sort-arrow" id="sa-statusLabel">↕</span></th>
             <th onclick="sortBy('category')">Category <span class="sort-arrow" id="sa-category">↕</span></th>
+            <th>Team</th>
             <th>Contact</th>
             <th onclick="sortBy('lastActivity')">Last Activity <span class="sort-arrow" id="sa-lastActivity">↕</span></th>
             <th onclick="sortBy('taskDate')">Task Date <span class="sort-arrow" id="sa-taskDate">↕</span></th>
@@ -202,7 +218,9 @@ tbody tr { animation: fadeIn 0.18s ease both; }
             <th></th>
           </tr>
         </thead>
-        <tbody id="tbl-body"></tbody>
+        <tbody id="tbl-body">
+          <tr><td colspan="11"><div class="empty-month"><div class="empty-title">Select a Month</div><div class="empty-sub">Use the month picker in the top right<br>to load leads for that period.</div></div></td></tr>
+        </tbody>
       </table>
     </div>
   </div>
@@ -216,7 +234,7 @@ tbody tr { animation: fadeIn 0.18s ease both; }
     </div>
     <div class="panel">
       <div class="panel-title">Today's Hit List</div>
-      <div id="hit-list"></div>
+      <div id="hit-list"><div style="color:var(--muted);font-size:12px;">Select a month to load.</div></div>
     </div>
     <div class="panel">
       <div class="panel-title">Pipeline by Category</div>
@@ -224,7 +242,7 @@ tbody tr { animation: fadeIn 0.18s ease both; }
     </div>
     <div class="panel" style="border-bottom:none;">
       <div class="panel-title">Operator Rules</div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;flex-direction:column;gap:9px;">
         <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--gold);">Deposit Paid = collect remaining balance same day.</div>
         <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--orange);">Closer Follow Up = call today. Post-call, needs closing.</div>
         <div style="font-size:12px;color:var(--muted2);line-height:1.6;padding-left:10px;border-left:2px solid var(--red);">Missed Payment = contact within 24 hours. No exceptions.</div>
@@ -236,12 +254,14 @@ tbody tr { animation: fadeIn 0.18s ease both; }
 </div>
 
 <script>
+// ─── API ──────────────────────────────────────────────────────────────────────
 async function closeGet(endpoint) {
   const r = await fetch('/.netlify/functions/close?endpoint=' + encodeURIComponent(endpoint));
   if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
 
+// ─── STATUS MAP ───────────────────────────────────────────────────────────────
 const STATUS_MAP = {
   'Deposit Paid':'deposit','CEO - Deposit':'deposit','VIP - Deposit':'deposit',
   'Closer Follow Up':'closer',
@@ -256,60 +276,54 @@ const STATUS_MAP = {
   'DQ':'dead','opt out':'dead','NGMI':'dead','Refunded':'dead',
   'Low ticket - Broke':'dead','Duplicate':'dead'
 };
-
 const CATEGORY_LABELS = {
-  deposit:'Deposit Paid', closer:'Closer Follow Up', setter:'Setter Follow Up',
-  newlead:'New Lead', missed:'Missed Payment', signedup:'Signed Up',
-  closed:'Closed', nurture:'Nurture', dead:'Dead / DQ', unknown:'Uncategorized'
+  deposit:'Deposit Paid',closer:'Closer Follow Up',setter:'Setter Follow Up',
+  newlead:'New Lead',missed:'Missed Payment',signedup:'Signed Up',
+  closed:'Closed',nurture:'Nurture',dead:'Dead / DQ',unknown:'Uncategorized'
 };
 const CATEGORY_COLORS = {
-  deposit:'var(--gold)', closer:'var(--orange)', setter:'var(--blue)',
-  newlead:'var(--purple)', missed:'var(--red)', signedup:'var(--green)',
-  closed:'var(--green)', nurture:'var(--muted2)', dead:'var(--muted)', unknown:'var(--muted)'
+  deposit:'var(--gold)',closer:'var(--orange)',setter:'var(--blue)',
+  newlead:'var(--purple)',missed:'var(--red)',signedup:'var(--green)',
+  closed:'var(--green)',nurture:'var(--muted2)',dead:'var(--muted)',unknown:'var(--muted)'
 };
 const STATUS_CLASS = {
-  deposit:'s-deposit', closer:'s-closer', setter:'s-setter', newlead:'s-newlead',
-  missed:'s-missed', signedup:'s-signedup', closed:'s-closed',
-  nurture:'s-nurture', dead:'s-dead', unknown:'s-unknown'
+  deposit:'s-deposit',closer:'s-closer',setter:'s-setter',newlead:'s-newlead',
+  missed:'s-missed',signedup:'s-signedup',closed:'s-closed',
+  nurture:'s-nurture',dead:'s-dead',unknown:'s-unknown'
 };
-const CAT_ORDER = { missed:0, deposit:1, closer:2, setter:3, newlead:4, signedup:5, closed:6, nurture:7, dead:8, unknown:9 };
+const CAT_ORDER = {missed:0,deposit:1,closer:2,setter:3,newlead:4,signedup:5,closed:6,nurture:7,dead:8,unknown:9};
 
+// ─── STATE ────────────────────────────────────────────────────────────────────
 let leads = [], sortField = 'category', sortDir = 'asc';
+let statusesLoaded = false;
 
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
 function today() { return new Date().toISOString().split('T')[0]; }
 function addDays(n) { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
-function fmtDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-}
-function fmtDateShort(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'});
-}
+function fmtDate(iso) { if(!iso) return '—'; return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function fmtDateShort(iso) { if(!iso) return '—'; return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}); }
 function setSyncStatus(state,msg) {
   document.getElementById('sync-dot').className='sync-dot '+state;
-  document.getElementById('sync-txt').textContent=msg||(state==='ok'?'Live — Close CRM':state==='syncing'?'Loading...':'Error');
+  document.getElementById('sync-txt').textContent=msg||(state==='ok'?'Live':state==='syncing'?'Loading...':'Error');
 }
 function getCategory(label) {
-  if (!label) return 'unknown';
-  if (STATUS_MAP[label]) return STATUS_MAP[label];
+  if(!label) return 'unknown';
+  if(STATUS_MAP[label]) return STATUS_MAP[label];
   const l=label.toLowerCase();
-  for (const [k,v] of Object.entries(STATUS_MAP)) { if(k.toLowerCase()===l) return v; }
+  for(const [k,v] of Object.entries(STATUS_MAP)) { if(k.toLowerCase()===l) return v; }
   return 'unknown';
 }
-function clearDates() {
-  document.getElementById('flt-date-from').value='';
-  document.getElementById('flt-date-to').value='';
-  renderTable();
-}
-function sortBy(field) {
-  sortDir = sortField===field ? (sortDir==='asc'?'desc':'asc') : 'asc';
-  sortField = field;
-  ['name','statusLabel','category','lastActivity','taskDate','dateCreated'].forEach(f=>{
-    const el=document.getElementById('sa-'+f);
-    if(el){ el.textContent=sortField===f?(sortDir==='asc'?'↑':'↓'):'↕'; el.className='sort-arrow'+(sortField===f?' active':''); }
-  });
-  renderTable();
+
+// Extract assigned users from a lead's activities/tasks
+function getTeamFromLead(l) {
+  // Close stores assigned users on the lead object
+  // We pull from assigned_to and task assigned_to fields
+  const closer = l.assigned_to_name || '';
+  // Tasks assigned to gives us setter context
+  const tasks = l.tasks || [];
+  const setterTask = tasks.find(t => t.assigned_to_name && t.assigned_to_name !== closer);
+  const setter = setterTask ? setterTask.assigned_to_name : '';
+  return { closer, setter };
 }
 
 function mapLead(l) {
@@ -317,6 +331,7 @@ function mapLead(l) {
   const phone=(contact.phones||[])[0];
   const email=(contact.emails||[])[0];
   const task=(l.tasks||[]).filter(t=>!t.is_complete).sort((a,b)=>a.due_date<b.due_date?-1:1)[0];
+  const { closer, setter } = getTeamFromLead(l);
   return {
     id:l.id, name:l.display_name||'Unknown',
     statusLabel:l.status_label||'',
@@ -328,62 +343,111 @@ function mapLead(l) {
     lastActivity:l.date_updated||'',
     dateCreated:l.date_created||'',
     description:l.description||'',
+    closer, setter,
     closeUrl:`https://app.close.com/lead/${l.id}/`
   };
 }
 
+function getMonthRange(val) {
+  const [year,month] = val.split('-').map(Number);
+  const from = new Date(year,month-1,1).toISOString();
+  const to   = new Date(year,month,1).toISOString();
+  return { from, to };
+}
+
+// ─── LOAD ─────────────────────────────────────────────────────────────────────
 async function loadFromClose() {
+  const monthVal = document.getElementById('month-picker').value;
+  if (!monthVal) { setSyncStatus('','Pick a month'); return; }
+
   document.getElementById('loader').style.display='flex';
-  document.getElementById('loader-txt').textContent='Connecting to Close CRM...';
+  document.getElementById('loader-txt').textContent='Loading leads...';
   setSyncStatus('syncing');
-  leads = [];
+  leads=[];
+
+  const { from, to } = getMonthRange(monthVal);
+  const dateFilter = `&date_created__gte=${encodeURIComponent(from)}&date_created__lt=${encodeURIComponent(to)}`;
+  const fields = 'id,display_name,status_label,contacts,tasks,date_updated,date_created,description,assigned_to_name';
 
   try {
-    // Load statuses and first batch in parallel
-    const [statusData, firstBatch] = await Promise.all([
-      closeGet('/status/lead/'),
-      closeGet(`/lead/?_limit=100&_skip=0&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description&_order_by=-date_updated`)
-    ]);
+    // Load statuses once
+    if (!statusesLoaded) {
+      const statusData = await closeGet('/status/lead/');
+      const sel = document.getElementById('flt-status');
+      sel.innerHTML='<option value="">All Statuses</option>';
+      (statusData.data||[]).forEach(s=>{
+        const o=document.createElement('option');
+        o.value=s.label; o.textContent=s.label; sel.appendChild(o);
+      });
+      statusesLoaded=true;
+    }
 
-    // Populate status filter
-    const sel = document.getElementById('flt-status');
-    sel.innerHTML='<option value="">All Statuses</option>';
-    (statusData.data||[]).forEach(s=>{
-      const o=document.createElement('option');
-      o.value=s.label; o.textContent=s.label; sel.appendChild(o);
-    });
-
-    // Render first batch immediately — page feels instant
+    // Load first page — renders immediately
+    const firstBatch = await closeGet(`/lead/?_limit=100&_skip=0&_fields=${fields}&_order_by=-date_updated${dateFilter}`);
     leads = (firstBatch.data||[]).map(mapLead);
     document.getElementById('loader').style.display='none';
-    setSyncStatus('ok', 'Loading...');
+    setSyncStatus('ok',`${leads.length} leads`);
     renderAll();
+    populateTeamFilters();
 
-    // Load all remaining pages in background progressively
+    // Load additional pages for this month in background
     if (firstBatch.has_more) {
-      let skip = 100;
-      let hasMore = firstBatch.has_more;
-      while (hasMore) {
-        const data = await closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=id,display_name,status_label,contacts,tasks,date_updated,date_created,description&_order_by=-date_updated`);
-        const newLeads = (data.data||[]).map(mapLead);
-        leads = leads.concat(newLeads);
-        document.getElementById('sync-txt').textContent=`Loading... ${leads.length} leads`;
+      let skip=100, hasMore=true;
+      while(hasMore) {
+        const data = await closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=${fields}&_order_by=-date_updated${dateFilter}`);
+        leads = leads.concat((data.data||[]).map(mapLead));
+        setSyncStatus('ok',`${leads.length} leads`);
         renderAll();
-        hasMore = data.has_more || false;
-        skip += 100;
+        populateTeamFilters();
+        hasMore=data.has_more||false;
+        skip+=100;
       }
     }
 
-    setSyncStatus('ok', `Live — ${leads.length} leads`);
+    setSyncStatus('ok',`${leads.length} leads`);
 
   } catch(e) {
     setSyncStatus('error','Error');
     document.getElementById('loader').style.display='none';
     console.error(e);
-    alert('Could not load Close CRM data: '+e.message+'\n\nMake sure this is hosted on Netlify.');
+    alert('Could not load Close CRM: '+e.message+'\n\nMake sure this is hosted on Netlify.');
   }
 }
 
+// ─── TEAM FILTERS ─────────────────────────────────────────────────────────────
+function populateTeamFilters() {
+  const closers = [...new Set(leads.map(l=>l.closer).filter(Boolean))].sort();
+  const setters = [...new Set(leads.map(l=>l.setter).filter(Boolean))].sort();
+
+  const cSel = document.getElementById('flt-closer');
+  const curC = cSel.value;
+  cSel.innerHTML='<option value="">All Closers</option>';
+  closers.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; if(c===curC) o.selected=true; cSel.appendChild(o); });
+
+  const sSel = document.getElementById('flt-setter');
+  const curS = sSel.value;
+  sSel.innerHTML='<option value="">All Setters</option>';
+  setters.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; if(s===curS) o.selected=true; sSel.appendChild(o); });
+}
+
+function clearDates() {
+  document.getElementById('flt-date-from').value='';
+  document.getElementById('flt-date-to').value='';
+  renderTable();
+}
+
+// ─── SORT ─────────────────────────────────────────────────────────────────────
+function sortBy(field) {
+  sortDir = sortField===field?(sortDir==='asc'?'desc':'asc'):'asc';
+  sortField=field;
+  ['name','statusLabel','category','lastActivity','taskDate','dateCreated'].forEach(f=>{
+    const el=document.getElementById('sa-'+f);
+    if(el){ el.textContent=sortField===f?(sortDir==='asc'?'↑':'↓'):'↕'; el.className='sort-arrow'+(sortField===f?' active':''); }
+  });
+  renderTable();
+}
+
+// ─── RENDER STATS ─────────────────────────────────────────────────────────────
 function renderStats() {
   const deposit  = leads.filter(l=>l.category==='deposit').length;
   const closer   = leads.filter(l=>l.category==='closer').length;
@@ -391,17 +455,21 @@ function renderStats() {
   const signedup = leads.filter(l=>l.category==='signedup').length;
   const closed   = leads.filter(l=>l.category==='closed').length;
   document.getElementById('stats-row').innerHTML=[
-    {label:'Total Leads',      val:leads.length,      note:'In Close CRM',              color:'var(--blue)'},
-    {label:'Deposit Paid',     val:deposit,            note:'Collect balance',           color:'var(--gold)'},
-    {label:'Closer Follow Up', val:closer,             note:'Call today',                color:'var(--orange)'},
-    {label:'Missed Payment',   val:missed,             note:missed>0?'Act now':'Clear',  color:missed>0?'var(--red)':'var(--muted)'},
-    {label:'Closed / Signed',  val:closed+signedup,   note:'Won deals',                 color:'var(--green)'}
+    {label:'Total Leads',      val:leads.length,    note:'This month',               color:'var(--blue)'},
+    {label:'Deposit Paid',     val:deposit,          note:'Collect balance',          color:'var(--gold)'},
+    {label:'Closer Follow Up', val:closer,           note:'Call today',               color:'var(--orange)'},
+    {label:'Missed Payment',   val:missed,           note:missed>0?'Act now':'Clear', color:missed>0?'var(--red)':'var(--muted)'},
+    {label:'Signed Up',        val:signedup,         note:'In program',               color:'var(--green)'},
+    {label:'Closed',           val:closed,           note:'Won deals',                color:'var(--green)'}
   ].map(s=>`<div class="stat" style="--stat-color:${s.color};"><div class="stat-label">${s.label}</div><div class="stat-val">${s.val}</div><div class="stat-note">${s.note}</div></div>`).join('');
 }
 
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────────
 function renderTable() {
-  const fCat      = document.getElementById('flt-category').value;
-  const fStatus   = document.getElementById('flt-status').value;
+  const fCat    = document.getElementById('flt-category').value;
+  const fStatus = document.getElementById('flt-status').value;
+  const fCloser   = document.getElementById('flt-closer').value;
+  const fSetter   = document.getElementById('flt-setter').value;
   const fDateFrom = document.getElementById('flt-date-from').value;
   const fDateTo   = document.getElementById('flt-date-to').value;
   const t         = today();
@@ -409,22 +477,24 @@ function renderTable() {
   let rows=leads.filter(l=>{
     if(fCat    && l.category!==fCat)       return false;
     if(fStatus && l.statusLabel!==fStatus) return false;
-    if(fDateFrom||fDateTo){
-      const created=l.dateCreated?l.dateCreated.split('T')[0]:'';
-      if(fDateFrom && created<fDateFrom) return false;
-      if(fDateTo   && created>fDateTo)   return false;
+    if(fCloser && l.closer!==fCloser)      return false;
+    if(fSetter && l.setter!==fSetter)      return false;
+    if(fDateFrom || fDateTo){
+      const created = l.dateCreated ? l.dateCreated.split('T')[0] : '';
+      if(fDateFrom && created < fDateFrom) return false;
+      if(fDateTo   && created > fDateTo)   return false;
     }
     return true;
   });
 
   rows.sort((a,b)=>{
     let av,bv;
-    if      (sortField==='category')     {av=CAT_ORDER[a.category]||9;   bv=CAT_ORDER[b.category]||9;}
-    else if (sortField==='name')         {av=a.name.toLowerCase();         bv=b.name.toLowerCase();}
-    else if (sortField==='statusLabel')  {av=a.statusLabel.toLowerCase();  bv=b.statusLabel.toLowerCase();}
-    else if (sortField==='lastActivity') {av=a.lastActivity||'';           bv=b.lastActivity||'';}
-    else if (sortField==='taskDate')     {av=a.taskDate||'9999';           bv=b.taskDate||'9999';}
-    else if (sortField==='dateCreated')  {av=a.dateCreated||'';            bv=b.dateCreated||'';}
+    if      (sortField==='category')     {av=CAT_ORDER[a.category]||9;  bv=CAT_ORDER[b.category]||9;}
+    else if (sortField==='name')         {av=a.name.toLowerCase();       bv=b.name.toLowerCase();}
+    else if (sortField==='statusLabel')  {av=a.statusLabel.toLowerCase();bv=b.statusLabel.toLowerCase();}
+    else if (sortField==='lastActivity') {av=a.lastActivity||'';         bv=b.lastActivity||'';}
+    else if (sortField==='taskDate')     {av=a.taskDate||'9999';         bv=b.taskDate||'9999';}
+    else if (sortField==='dateCreated')  {av=a.dateCreated||'';          bv=b.dateCreated||'';}
     else {av=0;bv=0;}
     if(av<bv) return sortDir==='asc'?-1:1;
     if(av>bv) return sortDir==='asc'?1:-1;
@@ -434,8 +504,8 @@ function renderTable() {
   document.getElementById('row-count').textContent=rows.length+' leads';
   const tbody=document.getElementById('tbl-body');
 
-  if(!rows.length){
-    tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:48px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:1px;">No leads match</td></tr>`;
+  if(!rows.length) {
+    tbody.innerHTML=`<tr><td colspan="11"><div class="empty-month"><div class="empty-title">No Leads Match</div><div class="empty-sub">Try adjusting your filters.</div></div></td></tr>`;
     return;
   }
 
@@ -454,18 +524,26 @@ function renderTable() {
       taskDateHtml=`<span class="date-txt ${cls}">${fmtDate(l.taskDate)}</span>`;
     }
 
-    const taskHtml=l.taskText?`<div style="font-size:11px;color:var(--muted2);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px;">${l.taskText}</div>`:'';
+    const taskHtml=l.taskText?`<div style="font-size:10px;color:var(--muted2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px;">${l.taskText}</div>`:'';
     const contact=l.phone||l.email||l.contactName||'—';
     const notesTxt=(l.taskText||l.description||'').replace(/"/g,'&quot;').substring(0,200);
     const notesHtml=notesTxt?`<span class="note-dot" data-n="${notesTxt}">i</span>`:'';
     const isUrgent=['missed','deposit','closer'].includes(l.category);
 
+    // Team pills
+    let teamHtml='<span style="color:var(--muted);font-size:11px;">—</span>';
+    const pills=[];
+    if(l.closer) pills.push(`<div class="team-pill team-closer"><span class="team-role">C</span>${l.closer}</div>`);
+    if(l.setter) pills.push(`<div class="team-pill team-setter"><span class="team-role">S</span>${l.setter}</div>`);
+    if(pills.length) teamHtml=`<div style="display:flex;flex-direction:column;gap:2px;">${pills.join('')}</div>`;
+
     return `
       <tr class="${isUrgent?'is-urgent':''}" onclick="window.open('${l.closeUrl}','_blank')">
-        <td style="padding:12px 4px 12px 10px;"><span class="stripe" style="background:${stripe};"></span></td>
+        <td style="padding:11px 4px 11px 8px;"><span class="stripe" style="background:${stripe};"></span></td>
         <td><div class="name-primary">${l.name}</div>${l.contactName&&l.contactName!==l.name?`<div class="name-sub">${l.contactName}</div>`:''}</td>
-        <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted2);">${l.statusLabel||'—'}</span></td>
+        <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--muted2);">${l.statusLabel||'—'}</span></td>
         <td><span class="cat-badge ${catClass}">${catLabel}</span></td>
+        <td>${teamHtml}</td>
         <td><span class="contact-tag">${contact}</span></td>
         <td><span class="date-txt d-normal">${fmtDate(l.lastActivity)}</span></td>
         <td>${taskHtml}${taskDateHtml}</td>
@@ -476,6 +554,7 @@ function renderTable() {
   }).join('');
 }
 
+// ─── RENDER SIDE ──────────────────────────────────────────────────────────────
 function renderSide() {
   const t=today();
   const urgent=leads.filter(l=>['missed','deposit','closer'].includes(l.category));
@@ -483,8 +562,10 @@ function renderSide() {
   if(urgent.length){
     up.style.display='block';
     document.getElementById('urgent-list').innerHTML=urgent.slice(0,6).map(l=>`
-      <div class="alert-item"><strong>${l.name}</strong>
-      <span style="color:${CATEGORY_COLORS[l.category]};font-family:'Barlow Condensed',sans-serif;font-size:12px;">${CATEGORY_LABELS[l.category]}</span></div>`).join('');
+      <div class="alert-item">
+        <strong>${l.name}</strong>
+        <span style="color:${CATEGORY_COLORS[l.category]};font-family:'Barlow Condensed',sans-serif;font-size:11px;">${CATEGORY_LABELS[l.category]}</span>
+      </div>`).join('');
   } else { up.style.display='none'; }
 
   const hitting=leads.filter(l=>{
@@ -503,9 +584,10 @@ function renderSide() {
           :l.taskText||'Follow up now';
         const td=l.taskDate?l.taskDate.split('T')[0]:'';
         const tl=td?fmtDateShort(l.taskDate):'';
-        return `<div class="hit-item"><div class="hit-dot" style="background:${dotColors[l.category]||'var(--blue)'}"></div><div style="flex:1;"><div class="hit-name">${l.name}</div><div class="hit-task">${task}</div></div><div class="hit-time" style="color:${td&&td<t?'var(--red)':'var(--muted)'}">${tl}</div></div>`;
+        const teamNote = l.closer ? ` · ${l.closer}` : '';
+        return `<div class="hit-item"><div class="hit-dot" style="background:${dotColors[l.category]||'var(--blue)'}"></div><div style="flex:1;"><div class="hit-name">${l.name}</div><div class="hit-task">${task}${teamNote}</div></div><div class="hit-time" style="color:${td&&td<t?'var(--red)':'var(--muted)'}">${tl}</div></div>`;
       }).join('')
-    :`<div style="color:var(--muted);font-size:12px;padding:8px 0;">No urgent actions today.</div>`;
+    :`<div style="color:var(--muted);font-size:12px;padding:8px 0;">No urgent actions for this month.</div>`;
 
   const cats=['deposit','closer','setter','newlead','missed','signedup','closed','nurture','dead'];
   const total=leads.length||1;
@@ -518,7 +600,12 @@ function renderSide() {
 
 function renderAll(){ renderStats(); renderTable(); renderSide(); }
 
-document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+// Set current month as default
+const now = new Date();
+const defaultMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+document.getElementById('month-picker').value = defaultMonth;
+document.getElementById('hdr-date').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+
 loadFromClose();
 </script>
 </body>
