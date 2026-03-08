@@ -214,6 +214,7 @@ tbody tr { animation:fadeIn 0.15s ease both; }
             <th onclick="sortBy('lastActivity')">Last Activity <span class="sort-arrow" id="sa-lastActivity">↕</span></th>
             <th onclick="sortBy('taskDate')">Task Date <span class="sort-arrow" id="sa-taskDate">↕</span></th>
             <th onclick="sortBy('dateCreated')">Created <span class="sort-arrow" id="sa-dateCreated">↕</span></th>
+            <th onclick="sortBy('oppValue')">Opp Value <span class="sort-arrow" id="sa-oppValue">↕</span></th>
             <th>Open</th>
             <th></th>
           </tr>
@@ -226,10 +227,16 @@ tbody tr { animation:fadeIn 0.15s ease both; }
   </div>
 
   <div class="side">
-    <div class="panel" id="urgent-panel" style="display:none;">
-      <div class="alert-box">
-        <div class="alert-title">⚡ Needs Action Now</div>
-        <div id="urgent-list"></div>
+    <div class="panel" id="act-now-panel" style="display:none;">
+      <div style="border:1px solid var(--red);padding:10px 12px;background:rgba(224,82,82,0.05);">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:8px;">⚡ Act Now</div>
+        <div id="act-now-list"></div>
+      </div>
+    </div>
+    <div class="panel" id="needs-pay-panel" style="display:none;">
+      <div style="border:1px solid var(--gold);padding:10px 12px;background:rgba(201,168,76,0.05);">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">💰 Needs to Pay</div>
+        <div id="needs-pay-list"></div>
       </div>
     </div>
     <div class="panel">
@@ -332,6 +339,10 @@ function mapLead(l) {
   const email=(contact.emails||[])[0];
   const task=(l.tasks||[]).filter(t=>!t.is_complete).sort((a,b)=>a.due_date<b.due_date?-1:1)[0];
   const { closer, setter } = getTeamFromLead(l);
+  // Pull opportunity value — Close stores in cents, active opps only
+  const opps = (l.opportunities||[]).filter(o=>o.status_type!=='lost');
+  const oppValue = opps.reduce((s,o)=>s+(o.value||0),0) / 100;
+  const oppLabel = opps.length ? opps.map(o=>o.status_label||'').filter(Boolean).join(', ') : '';
   return {
     id:l.id, name:l.display_name||'Unknown',
     statusLabel:l.status_label||'',
@@ -344,6 +355,7 @@ function mapLead(l) {
     dateCreated:l.date_created||'',
     description:l.description||'',
     closer, setter,
+    oppValue, oppLabel,
     closeUrl:`https://app.close.com/lead/${l.id}/`
   };
 }
@@ -367,7 +379,7 @@ async function loadFromClose() {
 
   const { from, to } = getMonthRange(monthVal);
   const dateFilter = `&date_created__gte=${encodeURIComponent(from)}&date_created__lt=${encodeURIComponent(to)}`;
-  const fields = 'id,display_name,status_label,contacts,tasks,date_updated,date_created,description,assigned_to_name';
+  const fields = 'id,display_name,status_label,contacts,tasks,opportunities,date_updated,date_created,description,assigned_to_name';
 
   try {
     // Load statuses once
@@ -382,7 +394,7 @@ async function loadFromClose() {
       statusesLoaded=true;
     }
 
-    // Load first page — renders immediately
+    // Load first page immediately — show data right away
     const firstBatch = await closeGet(`/lead/?_limit=100&_skip=0&_fields=${fields}&_order_by=-date_updated${dateFilter}`);
     leads = (firstBatch.data||[]).map(mapLead);
     document.getElementById('loader').style.display='none';
@@ -390,17 +402,32 @@ async function loadFromClose() {
     renderAll();
     populateTeamFilters();
 
-    // Load additional pages for this month in background
+    // Fire all remaining pages in parallel — no waiting around
     if (firstBatch.has_more) {
-      let skip=100, hasMore=true;
-      while(hasMore) {
-        const data = await closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=${fields}&_order_by=-date_updated${dateFilter}`);
-        leads = leads.concat((data.data||[]).map(mapLead));
-        setSyncStatus('ok',`${leads.length} leads`);
+      // Fetch page 2 to find total, then blast all pages at once
+      const page2 = await closeGet(`/lead/?_limit=100&_skip=100&_fields=${fields}&_order_by=-date_updated${dateFilter}`);
+      const page2Leads = (page2.data||[]).map(mapLead);
+      leads = leads.concat(page2Leads);
+      renderAll();
+
+      if (page2.has_more) {
+        // Fire pages 3-10 simultaneously
+        const parallelPages = [];
+        for (let skip=200; skip<=900; skip+=100) {
+          parallelPages.push(
+            closeGet(`/lead/?_limit=100&_skip=${skip}&_fields=${fields}&_order_by=-date_updated${dateFilter}`)
+              .then(d => (d.data||[]).map(mapLead))
+              .catch(()=>[])
+          );
+        }
+        const results = await Promise.all(parallelPages);
+        // Merge all results and filter out empty pages
+        for (const batch of results) {
+          if (batch.length === 0) break;
+          leads = leads.concat(batch);
+        }
         renderAll();
         populateTeamFilters();
-        hasMore=data.has_more||false;
-        skip+=100;
       }
     }
 
@@ -440,7 +467,7 @@ function clearDates() {
 function sortBy(field) {
   sortDir = sortField===field?(sortDir==='asc'?'desc':'asc'):'asc';
   sortField=field;
-  ['name','statusLabel','category','lastActivity','taskDate','dateCreated'].forEach(f=>{
+  ['name','statusLabel','category','lastActivity','taskDate','dateCreated','oppValue'].forEach(f=>{
     const el=document.getElementById('sa-'+f);
     if(el){ el.textContent=sortField===f?(sortDir==='asc'?'↑':'↓'):'↕'; el.className='sort-arrow'+(sortField===f?' active':''); }
   });
@@ -495,6 +522,7 @@ function renderTable() {
     else if (sortField==='lastActivity') {av=a.lastActivity||'';         bv=b.lastActivity||'';}
     else if (sortField==='taskDate')     {av=a.taskDate||'9999';         bv=b.taskDate||'9999';}
     else if (sortField==='dateCreated')  {av=a.dateCreated||'';          bv=b.dateCreated||'';}
+    else if (sortField==='oppValue')     {av=a.oppValue||0;              bv=b.oppValue||0;}
     else {av=0;bv=0;}
     if(av<bv) return sortDir==='asc'?-1:1;
     if(av>bv) return sortDir==='asc'?1:-1;
@@ -548,6 +576,7 @@ function renderTable() {
         <td><span class="date-txt d-normal">${fmtDate(l.lastActivity)}</span></td>
         <td>${taskHtml}${taskDateHtml}</td>
         <td><span class="date-txt d-normal">${fmtDate(l.dateCreated)}</span></td>
+        <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:${l.oppValue>0?'var(--gold)':'var(--muted)'};">${l.oppValue>0?'$'+l.oppValue.toLocaleString():'—'}</span>${l.oppLabel?`<div style="font-size:10px;color:var(--muted2);margin-top:2px;">${l.oppLabel}</div>`:''}</td>
         <td onclick="event.stopPropagation();"><a href="${l.closeUrl}" target="_blank" class="ext-link">Open ↗</a></td>
         <td>${notesHtml}</td>
       </tr>`;
@@ -557,16 +586,46 @@ function renderTable() {
 // ─── RENDER SIDE ──────────────────────────────────────────────────────────────
 function renderSide() {
   const t=today();
-  const urgent=leads.filter(l=>['missed','deposit','closer'].includes(l.category));
-  const up=document.getElementById('urgent-panel');
-  if(urgent.length){
-    up.style.display='block';
-    document.getElementById('urgent-list').innerHTML=urgent.slice(0,6).map(l=>`
-      <div class="alert-item">
-        <strong>${l.name}</strong>
-        <span style="color:${CATEGORY_COLORS[l.category]};font-family:'Barlow Condensed',sans-serif;font-size:11px;">${CATEGORY_LABELS[l.category]}</span>
-      </div>`).join('');
-  } else { up.style.display='none'; }
+  // ACT NOW — closer follow up + missed payment (most urgent)
+  const actNow = leads.filter(l=>['missed','closer'].includes(l.category));
+  const anp = document.getElementById('act-now-panel');
+  if(actNow.length){
+    anp.style.display='block';
+    document.getElementById('act-now-list').innerHTML=actNow.slice(0,8).map(l=>{
+      const amt = l.oppValue>0 ? `<span style="color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;">$${l.oppValue.toLocaleString()}</span>` : '';
+      const tag = `<span style="color:${CATEGORY_COLORS[l.category]};font-family:'Barlow Condensed',sans-serif;font-size:10px;">${CATEGORY_LABELS[l.category]}</span>`;
+      const who = l.closer ? `<div style="font-size:10px;color:var(--muted2);margin-top:1px;">Closer: ${l.closer}</div>` : '';
+      return `<div class="alert-item" style="flex-direction:column;align-items:flex-start;gap:2px;padding:6px 0;">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+          <strong>${l.name}</strong>${amt}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">${tag}${who}</div>
+      </div>`;
+    }).join('');
+  } else { anp.style.display='none'; }
+
+  // NEEDS TO PAY — deposit paid + signed up with open opp value
+  const needsPay = leads.filter(l=>['deposit','signedup','missed'].includes(l.category) && l.oppValue>0)
+    .sort((a,b)=>b.oppValue-a.oppValue);
+  const npp = document.getElementById('needs-pay-panel');
+  if(needsPay.length){
+    npp.style.display='block';
+    const totalOwed = needsPay.reduce((s,l)=>s+l.oppValue,0);
+    document.getElementById('needs-pay-list').innerHTML=
+      `<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--muted2);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);">
+        Total owed: <span style="color:var(--gold);font-weight:700;">$${totalOwed.toLocaleString()}</span>
+      </div>` +
+      needsPay.slice(0,8).map(l=>{
+        const tag = `<span style="color:${CATEGORY_COLORS[l.category]};font-family:'Barlow Condensed',sans-serif;font-size:10px;">${CATEGORY_LABELS[l.category]}</span>`;
+        return `<div class="alert-item" style="flex-direction:column;align-items:flex-start;gap:2px;padding:6px 0;">
+          <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+            <strong>${l.name}</strong>
+            <span style="color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;">$${l.oppValue.toLocaleString()}</span>
+          </div>
+          ${tag}
+        </div>`;
+      }).join('');
+  } else { npp.style.display='none'; }
 
   const hitting=leads.filter(l=>{
     if(['dead','closed','nurture'].includes(l.category)) return false;
