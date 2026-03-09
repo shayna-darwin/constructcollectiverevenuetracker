@@ -1,0 +1,55 @@
+const https = require('https');
+
+const CLOSE_API_KEY = 'api_4N1ISDKbAfmnk9Q8FAWobG.1vBLM0yUViFV0jT5qhwaOR';
+const BASE_URL = 'api.close.com';
+
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  const endpoint = req.query.endpoint;
+  if (!endpoint) {
+    return res.status(400).json({ error: 'Missing endpoint parameter' });
+  }
+
+  const auth = Buffer.from(`${CLOSE_API_KEY}:`).toString('base64');
+
+  const options = {
+    hostname: BASE_URL,
+    path: endpoint,
+    method: 'GET',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  };
+
+  return new Promise((resolve) => {
+    const request = https.request(options, (response) => {
+      let data = '';
+      response.on('data', chunk => { data += chunk; });
+      response.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          res.status(response.statusCode).json(parsed);
+        } catch (e) {
+          res.status(500).json({ error: 'Failed to parse Close API response', raw: data });
+        }
+        resolve();
+      });
+    });
+
+    request.on('error', (e) => {
+      res.status(500).json({ error: e.message });
+      resolve();
+    });
+
+    request.end();
+  });
+};
